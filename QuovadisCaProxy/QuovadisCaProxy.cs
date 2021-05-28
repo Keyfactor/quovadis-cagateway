@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CAProxy.AnyGateway;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
-using CSS.Common;
-using CSS.Common.Logging;
 using CSS.PKI;
-using Keyfactor.AnyGateway.Quovadis.Client;
-using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
@@ -31,7 +27,29 @@ namespace Keyfactor.AnyGateway.Quovadis
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
-            throw new InvalidOperationException();
+            RevokeCertificateRequestType rt=new RevokeCertificateRequestType();
+            CertificateServicesSoapClient client= new CertificateServicesSoapClient();
+
+            var x = new XmlSerializer(rt.GetType());
+            byte[] bytes;
+            using (MemoryStream stream = new MemoryStream())
+            {
+                x.Serialize(stream, rt);
+                bytes = stream.ToArray();
+            }
+
+            var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
+
+            var revokeResponse =
+                Task.Run(async () => await client.RevokeSSLCertAsync(APIVersion.v2_0,ContentEncoding.UTF8, signedRequest)).Result;
+
+            if (revokeResponse.RevokeSSLCertResponse.Result == RevokeResultType.RevocationRequestSuccessful)
+            {
+                return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
+            }
+
+            throw new Exception("Revoke failed");
+
         }
 
         [Obsolete]
