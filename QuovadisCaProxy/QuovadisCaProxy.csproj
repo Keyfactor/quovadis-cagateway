@@ -84,6 +84,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client\QuovadisProxy.cs" />
+    <Compile Include="Client\XSDs\EnrollmentRequest.cs">
+      <DependentUpon>EnrollmentRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RenewRequest.cs">
+      <DependentUpon>RenewRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetreiveCertificateRequest.cs">
+      <DependentUpon>RetreiveCertificateRequest.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Client\XSDs\RevokeRequest.cs">
       <DependentUpon>RevokeRequest.xsd</DependentUpon>
     </Compile>
@@ -96,6 +105,15 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Client\QuovadisProxy.config" />
+    <None Include="Client\XSDs\EnrollmentRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RenewRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetreiveCertificateRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Client\XSDs\RevokeRequest.xsd">
       <SubType>Designer</SubType>
     </None>

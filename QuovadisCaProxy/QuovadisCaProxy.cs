@@ -23,31 +23,39 @@ namespace Keyfactor.AnyGateway.Quovadis
         }
 
 
-        public bool EnableTemplateSync { get; set; }
+        private CertificateServicesSoapClient QuovadisClient { get; set; }
+
+        private string BaseUrl { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
-            RevokeCertificateRequestType rt=new RevokeCertificateRequestType();
-            CertificateServicesSoapClient client= new CertificateServicesSoapClient();
-
-            var x = new XmlSerializer(rt.GetType());
-            byte[] bytes;
-            using (MemoryStream stream = new MemoryStream())
+            try
             {
-                x.Serialize(stream, rt);
-                bytes = stream.ToArray();
+                RevokeCertificateRequestType rt = new RevokeCertificateRequestType();
+
+                var x = new XmlSerializer(rt.GetType());
+                byte[] bytes;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    x.Serialize(stream, rt);
+                    bytes = stream.ToArray();
+                }
+
+                var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
+
+                var revokeResponse =
+                    Task.Run(async () => await QuovadisClient.RevokeSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8, signedRequest)).Result;
+
+                if (revokeResponse.RevokeSSLCertResponse.Result == RevokeResultType.RevocationRequestSuccessful)
+                {
+                    return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
+                }
             }
-
-            var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
-
-            var revokeResponse =
-                Task.Run(async () => await client.RevokeSSLCertAsync(APIVersion.v2_0,ContentEncoding.UTF8, signedRequest)).Result;
-
-            if (revokeResponse.RevokeSSLCertResponse.Result == RevokeResultType.RevocationRequestSuccessful)
+            catch (Exception e)
             {
-                return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
+                throw new Exception($"Revoke failed with message {e.Message}");
             }
-
+            
             throw new Exception("Revoke failed");
 
         }
@@ -73,7 +81,72 @@ namespace Keyfactor.AnyGateway.Quovadis
             EnrollmentProductInfo productInfo,
             PKIConstants.X509.RequestFormat requestFormat, RequestUtilities.EnrollmentType enrollmentType)
         {
-            return null;
+            try
+            {
+                InitiateInviteRequestType it = new InitiateInviteRequestType();
+
+                var x = new XmlSerializer(it.GetType());
+                byte[] bytes;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    x.Serialize(stream, it);
+                    bytes = stream.ToArray();
+                }
+
+                var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
+
+                switch (enrollmentType)
+                {
+                    case RequestUtilities.EnrollmentType.New:
+                        var initiateResponse = Task.Run(async () =>
+                            await QuovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
+                                signedRequest)).Result;
+
+                        if (initiateResponse.InitiateInviteResponse.Result == InviteResultType.Success)
+                        {
+                            return new EnrollmentResult
+                            {
+                                Status = 9, //success
+                                StatusMessage =
+                                    $"Enrollment Succeeded with Id {initiateResponse.InitiateInviteResponse.TransactionId}"
+                            };
+                        }
+
+                        break;
+                    case RequestUtilities.EnrollmentType.Renew:
+                        var renewResponse = Task.Run(async () =>
+                            await QuovadisClient.RenewSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
+                                signedRequest)).Result;
+
+                        if (renewResponse.RenewSSLCertResponse.Result == ResultType.Success )
+                        {
+                            return new EnrollmentResult
+                            {
+                                Status = 9, //success
+                                StatusMessage =
+                                    $"Enrollment Succeeded with Id {renewResponse.RenewSSLCertResponse.TransactionId}"
+                            };
+                        }
+                        break;
+                    case RequestUtilities.EnrollmentType.Reissue:
+                        
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                return new EnrollmentResult
+                {
+                    Status = 30, //failure
+                    StatusMessage = $"Enrollment Failed with Message {e.Message}"
+                };
+            }
+
+            return new EnrollmentResult
+            {
+                Status = 30, //failure
+                StatusMessage = $"Enrollment Unknown Failure"
+            };
         }
 
         public override EnrollmentResult Enroll(ICertificateDataReader certificateDataReader, string csr,
@@ -92,7 +165,9 @@ namespace Keyfactor.AnyGateway.Quovadis
 
         public override void Initialize(ICAConnectorConfigProvider configProvider)
         {
-            throw new InvalidOperationException();
+            BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
+            QuovadisClient = new CertificateServicesSoapClient("Production", BaseUrl);
+
         }
 
         public override void Ping()

@@ -1,0 +1,128 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="InitiateInviteRequest" type="InitiateInviteRequestType" />
+	<xsd:complexType name="InitiateInviteRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="AdministratorEmailAddress" type="xsd:string" />
+			<xsd:element name="ValidityPeriod" type="xsd:int" minOccurs="0" />
+			<xsd:element name="TemplateId" type="xsd:int" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="CertContentFields" type="CertContentFieldsType" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="CSR" type="xsd:string" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="RegistrantInfo" type="RegistrantInfoType" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="Account" type="InviteAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CustomFields" type="
+						 KeyValuePairArray" minOccurs="0" />
+			<xsd:element name="Comments" type="xsd:string" minOccurs="0" />
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CertContentFieldsType">
+		<xsd:sequence>
+			<xsd:element name="CN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SNO" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="C" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="L" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="S" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SA" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="O" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="OU" type="InviteStringArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="T" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="PA" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="PC" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="TN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="GN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="I" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="GQ" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="DNQ" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="P" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="E" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="UN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="UA" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="UID" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="DC" type="InviteStringArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="D" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="OI" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SAN" type="InviteSANFieldArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="MSCTI" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="MSCTN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="MSAP" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="InviteStringArray">
+		<xsd:sequence>
+			<xsd:element name="Field" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="InviteSANFieldArray">
+		<xsd:sequence>
+			<xsd:element name="Field" type="InviteSANField" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="InviteSANField">
+		<xsd:sequence>
+			<xsd:element name="Type" type="InviteSANFieldType" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="InviteSANFieldType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Rfc822Name"/>
+			<xsd:enumeration value="UPN"/>
+			<xsd:enumeration value="Guid"/>
+			<xsd:enumeration value="Uri"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="KeyValuePairArray">
+		<xsd:sequence>
+			<xsd:element name="Item" type="EnrollKeyValuePair" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="EnrollKeyValuePair">
+		<xsd:sequence>
+			<xsd:element name="Key" type="xsd:string" minOccurs="1"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RegistrantInfoType">
+		<xsd:sequence>
+			<xsd:element name="FirstName" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="LastName" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="Email" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="PrimaryPhone" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="SecondaryPhone" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="IDTypeAudited" type="IDTypeAuditedType" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="ThirdPartyEmail" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SharedSecretOOB" type="SharedSecretOOBType" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="SharedSecretQuestion" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SharedSecretAnswer" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SharedSecretFormat" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="Password" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="ConfirmPassword" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="IDTypeAuditedType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Client_KYC_Record"/>
+			<xsd:enumeration value="Driver_License"/>
+			<xsd:enumeration value="Employee_ID_Card"/>
+			<xsd:enumeration value="Government_Issued_ID_Card"/>
+			<xsd:enumeration value="Military_ID_Card"/>
+			<xsd:enumeration value="Passport"/>
+			<xsd:enumeration value="Voter_Registration_Card"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SharedSecretOOBType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Yes"/>
+			<xsd:enumeration value="No"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="InviteAccountInfo">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="OrganisationGuid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

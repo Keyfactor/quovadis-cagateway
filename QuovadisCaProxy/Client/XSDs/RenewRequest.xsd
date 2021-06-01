@@ -1,0 +1,34 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RenewSSLCertRequest" type="RenewSSLCertRequestType" />
+	<xsd:complexType name="RenewSSLCertRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="SubscriberEmailAddress" type="xsd:string" />
+			<xsd:element name="CertificateType" type="xsd:int"></xsd:element>
+			<xsd:element name="CSR" type="xsd:string" />
+			<xsd:element name="Account" type="RenewAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ServerPlatform" type="xsd:string" />
+			<xsd:element name="CustomFields" type="RenewKeyValuePairArray" minOccurs="0" />
+			<xsd:element name="Comments" type="xsd:string" minOccurs="0" />
+			<xsd:element name="TransactionId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RenewAccountInfo">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RenewKeyValuePairArray">
+		<xsd:sequence>
+			<xsd:element name="Item" type="KeyValuePair" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="KeyValuePair">
+		<xsd:sequence>
+			<xsd:element name="Key" type="xsd:string" minOccurs="1"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
