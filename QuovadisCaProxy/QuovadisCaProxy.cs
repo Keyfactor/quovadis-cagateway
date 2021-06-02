@@ -81,6 +81,13 @@ namespace Keyfactor.AnyGateway.Quovadis
             EnrollmentProductInfo productInfo,
             PKIConstants.X509.RequestFormat requestFormat, RequestUtilities.EnrollmentType enrollmentType)
         {
+            throw new NotImplementedException();
+        }
+
+        public override EnrollmentResult Enroll(ICertificateDataReader certificateDataReader, string csr,
+            string subject, Dictionary<string, string[]> san, EnrollmentProductInfo productInfo,
+            PKIConstants.X509.RequestFormat requestFormat, RequestUtilities.EnrollmentType enrollmentType)
+        {
             try
             {
                 InitiateInviteRequestType it = new InitiateInviteRequestType();
@@ -118,7 +125,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                             await QuovadisClient.RenewSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
                                 signedRequest)).Result;
 
-                        if (renewResponse.RenewSSLCertResponse.Result == ResultType.Success )
+                        if (renewResponse.RenewSSLCertResponse.Result == ResultType.Success)
                         {
                             return new EnrollmentResult
                             {
@@ -129,7 +136,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                         }
                         break;
                     case RequestUtilities.EnrollmentType.Reissue:
-                        
+
                         break;
                 }
             }
@@ -149,24 +156,17 @@ namespace Keyfactor.AnyGateway.Quovadis
             };
         }
 
-        public override EnrollmentResult Enroll(ICertificateDataReader certificateDataReader, string csr,
-            string subject, Dictionary<string, string[]> san, EnrollmentProductInfo productInfo,
-            PKIConstants.X509.RequestFormat requestFormat, RequestUtilities.EnrollmentType enrollmentType)
-        {
-            throw new InvalidOperationException();
-        }
-
 
         
         public override CAConnectorCertificate GetSingleRecord(string caRequestId)
         {
-            throw new InvalidOperationException();
+            return new CAConnectorCertificate();
         }
 
         public override void Initialize(ICAConnectorConfigProvider configProvider)
         {
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
-            QuovadisClient = new CertificateServicesSoapClient("Production", BaseUrl);
+            //QuovadisClient = new CertificateServicesSoapClient(;
 
         }
 
