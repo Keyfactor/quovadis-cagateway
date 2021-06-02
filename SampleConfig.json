@@ -1,0 +1,57 @@
+{
+  "Security": {
+    "KEYFACTOR\\administrator": {
+      "READ": "Allow",
+      "ENROLL": "Allow",
+      "OFFICER": "Allow",
+      "ADMINISTRATOR": "Allow"
+    },
+    "KEYFACTOR\\SVC_AppPool": {
+      "READ": "Allow",
+      "ENROLL": "Allow",
+      "OFFICER": "Allow",
+      "ADMINISTRATOR": "Allow"
+    },
+    "KEYFACTOR\\SVC_TimerService": {
+      "READ": "Allow",
+      "ENROLL": "Allow",
+      "OFFICER": "Allow",
+      "ADMINISTRATOR": "Allow"
+    }
+  },
+  "CAConnection": {
+    "BaseUrl": "http://tle.quovadisglobal.com/webservices"
+  },
+  "Templates": {
+    "Quovadis Business Ssl": {
+      "ProductID": "Quovadis Business Ssl",
+      "Parameters": {}
+    },
+    "Quovadis Code Signing": {
+      "ProductID": "Quovadis Code Signing",
+      "Parameters": {}
+    },
+    "Quovadis Extended Validation Ssl": {
+      "ProductID": "Quovadis Extended Validation Ssl",
+      "Parameters": {}
+    },
+    "Quovadis Qualified Website Authentication Certificate": {
+      "ProductID": "Quovadis Qualified Website Authentication Certificate",
+      "Parameters": {}
+    }
+  },
+  "CertificateManagers": null,
+  "GatewayRegistration": {
+    "LogicalName": "Quovadis",
+    "GatewayCertificate": {
+      "StoreName": "CA",
+      "StoreLocation": "LocalMachine",
+      "Thumbprint": "fac5470a60d04b90ce947ebbf11b5f3fe9b275ae"
+    }
+  },
+  "ServiceSettings": {
+    "ViewIdleMinutes": 1,
+    "FullScanPeriodHours": 1,
+    "PartialScanPeriodMinutes": 1
+  }
+}

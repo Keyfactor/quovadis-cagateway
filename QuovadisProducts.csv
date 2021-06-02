@@ -1,5 +1,5 @@
 ﻿ProductName,Code,Vendor,Product Type,IsMultiDomain
-Business Ssl,Business Ssl,Quovadis,DV,No
-Extended Validation Ssl,Extended Validation Ssl,Quovadis,DV,No
-Qualified Website Authentication Certificate,Qualified Website Authentication Certificate,Quovadis,DV,No
-Code Signing,Code Signing,Quovadis,DV,No
+Quovadis Business Ssl,Quovadis Business Ssl,Quovadis,DV,No
+Quovadis Extended Validation Ssl,Quovadis Extended Validation Ssl,Quovadis,DV,No
+Quovadis Qualified Website Authentication Certificate,Quovadis Qualified Website Authentication Certificate,Quovadis,DV,No
+Quovadis Code Signing,Quovadis Code Signing,Quovadis,DV,No
