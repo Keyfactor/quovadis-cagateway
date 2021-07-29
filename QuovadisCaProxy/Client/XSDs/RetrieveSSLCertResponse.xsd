@@ -1,0 +1,19 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RetrieveSSLCertResponse" type="RetrieveSSLCertResponseType"/>
+	<xsd:complexType name="RetrieveSSLCertResponseType">
+		<xsd:sequence>
+			<xsd:element name="Result" type="CertResultType"/>
+			<xsd:element name="DateTime" type="xsd:dateTime"/>
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Details" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Certificate" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="CertResultType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Success"/>
+			<xsd:enumeration value="Failure"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

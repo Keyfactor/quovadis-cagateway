@@ -83,18 +83,155 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\QuovadisProxy.cs" />
-    <Compile Include="Client\XSDs\EnrollmentRequest.cs">
-      <DependentUpon>EnrollmentRequest.xsd</DependentUpon>
+    <Compile Include="Client\QuovadisClient.cs" />
+    <Compile Include="Client\XSDs\AddSubscriberRequest.cs">
+      <DependentUpon>AddSubscriberRequest.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Client\XSDs\RenewRequest.cs">
-      <DependentUpon>RenewRequest.xsd</DependentUpon>
+    <Compile Include="Client\XSDs\AddSubscriberResponse.cs">
+      <DependentUpon>AddSubscriberResponse.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Client\XSDs\RetreiveCertificateRequest.cs">
-      <DependentUpon>RetreiveCertificateRequest.xsd</DependentUpon>
+    <Compile Include="Client\XSDs\GetAccountDomainListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountDomainListRequest.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Client\XSDs\RevokeRequest.cs">
-      <DependentUpon>RevokeRequest.xsd</DependentUpon>
+    <Compile Include="Client\XSDs\GetAccountDomainListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountDomainListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountOrganisationListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountOrganisationListRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountOrganisationListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountOrganisationListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateDetailsRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateDetailsRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateDetailsResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateDetailsResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateListRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\InitiateInviteRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>InitiateInviteRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\InitiateInviteResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>InitiateInviteResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RenewSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RenewSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RenewSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RenewSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestCertificateStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestCertificateStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestCertificateStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestCertificateStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequestResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequestStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestStatusResponse.cs">
+      <DependentUpon>RequestDomainRequestStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequestResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequestResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequestStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequestStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveCertificateRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveCertificateRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveCertificateResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveCertificateResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateBySerialNoRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateBySerialNoRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateBySerialNoResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateBySerialNoResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeSSLCertResponse.xsd</DependentUpon>
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="QuovadisCaProxy.cs" />
@@ -104,17 +241,119 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Client\QuovadisProxy.config" />
-    <None Include="Client\XSDs\EnrollmentRequest.xsd">
+    <None Include="Client\QuovadisClient.config" />
+    <None Include="Client\XSDs\AddSubscriberRequest.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Client\XSDs\RenewRequest.xsd">
+    <None Include="Client\XSDs\AddSubscriberResponse.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Client\XSDs\RetreiveCertificateRequest.xsd">
+    <None Include="Client\XSDs\GetAccountDomainListRequest.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Client\XSDs\RevokeRequest.xsd">
+    <None Include="Client\XSDs\GetAccountDomainListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountOrganisationListRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountOrganisationListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateDetailsRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateDetailsResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateListRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\InitiateInviteRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\InitiateInviteResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RenewSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RenewSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestCertificateStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestCertificateStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequestResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequestStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveCertificateRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveCertificateResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateBySerialNoRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateBySerialNoResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeSSLCertResponse.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />

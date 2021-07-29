@@ -1,0 +1,34 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+	<xsd:element name="GetAccountPolicyTemplateDetailsResponse" type="GetAccountPolicyTemplateDetailsResponseType"/>
+	<xsd:complexType name="GetAccountPolicyTemplateDetailsResponseType">
+		<xsd:sequence>
+			<xsd:element name="Result" type="ResultType"/>
+			<xsd:element name="DateTime" type="xsd:dateTime"/>
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Details" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="PolicyTemplateDetails" type="PolicyTemplateDetailArray" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="ResultType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Success"/>
+			<xsd:enumeration value="Failure"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="PolicyTemplateDetailArray">
+		<xsd:sequence>
+			<xsd:element name="PolicyTemplateDetail" type="PolicyTemplateDetailList" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PolicyTemplateDetailList">
+		<xsd:sequence>
+			<xsd:element name="FieldName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="TemplateCaption" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="DefaultValue" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Required" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Editable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="FromOrg" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

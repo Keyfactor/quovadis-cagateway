@@ -1,15 +1,15 @@
 ﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<xsd:element name="RetrieveCertificateRequest" type="RetrieveCertificateRequestType" />
-	<xsd:complexType name="RetrieveCertificateRequestType">
+	<xsd:element name="RetrieveSSLCertRequest" type="RetrieveSSLCertRequestType" />
+	<xsd:complexType name="RetrieveSSLCertRequestType">
 		<xsd:sequence>
 			<xsd:element name="DateTime" type="xsd:dateTime" />
-			<xsd:element name="RequestPartyEmailAddress" type="xsd:string" />
-			<xsd:element name="Account" type="RetrieveCertificateAccountInfo" minOccurs="1" maxOccurs="1" />
-			<xsd:element name="TransactionId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="SubscriberEmailAddress" type="xsd:string" />
+			<xsd:element name="Account" type="RetrieveAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TransactionId" type="xsd:string" minOccurs="0"/>
 			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:complexType name="RetrieveCertificateAccountInfo">
+	<xsd:complexType name="RetrieveAccountInfo">
 		<xsd:sequence>
 			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>

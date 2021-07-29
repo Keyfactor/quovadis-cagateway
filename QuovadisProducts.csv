@@ -1,5 +1,5 @@
 ﻿ProductName,Code,Vendor,Product Type,IsMultiDomain
-Quovadis Business Ssl,Quovadis Business Ssl,Quovadis,DV,No
-Quovadis Extended Validation Ssl,Quovadis Extended Validation Ssl,Quovadis,DV,No
-Quovadis Qualified Website Authentication Certificate,Quovadis Qualified Website Authentication Certificate,Quovadis,DV,No
-Quovadis Code Signing,Quovadis Code Signing,Quovadis,DV,No
+SMIME P12 no registrant interaction,SMIME P12 no registrant interaction,Quovadis,DV,No
+SMIME CSR-based no registrant interaction,SMIME CSR-based no registrant interaction,Quovadis,DV,No
+SMIME P12,SMIME P12,Quovadis,DV,No
+SMIME Client Side Key Gen,SMIME Client Side Key Gen,Quovadis,DV,No

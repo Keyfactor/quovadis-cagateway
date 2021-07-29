@@ -1,0 +1,27 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RequestOrganisationRequestStatusResponse" type="RequestOrganisationRequestStatusResponseType"/>
+	<xsd:complexType name="RequestOrganisationRequestStatusResponseType">
+		<xsd:sequence>
+			<xsd:element name="Result" type="OrganisationRequestStatusResultType"/>
+			<xsd:element name="Status" type="OrganisationRequestStatusType"/>
+			<xsd:element name="DateTime" type="xsd:dateTime"/>
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Details" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="OrganisationRequestStatusResultType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Success"/>
+			<xsd:enumeration value="Failure"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OrganisationRequestStatusType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Unspecified"/>
+			<xsd:enumeration value="Pending"/>
+			<xsd:enumeration value="Approved"/>
+			<xsd:enumeration value="Rejected"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

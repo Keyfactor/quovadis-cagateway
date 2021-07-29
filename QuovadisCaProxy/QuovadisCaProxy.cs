@@ -10,6 +10,7 @@ using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
 using CSS.PKI;
 using System.Xml.Serialization;
+using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
@@ -46,7 +47,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                 var revokeResponse =
                     Task.Run(async () => await QuovadisClient.RevokeSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8, signedRequest)).Result;
 
-                if (revokeResponse.RevokeSSLCertResponse.Result == RevokeResultType.RevocationRequestSuccessful)
+                if (revokeResponse.RevokeSSLCertResponse.Result.Equals(RevokeResultType.Failure))
                 {
                     return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
                 }
@@ -102,7 +103,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                             await QuovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
                                 signedRequest)).Result;
 
-                        if (initiateResponse.InitiateInviteResponse.Result == InviteResultType.Success)
+                        if (initiateResponse.InitiateInviteResponse.Result.Equals(ResultType.Success))
                         {
                             return new EnrollmentResult
                             {
@@ -118,7 +119,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                             await QuovadisClient.RenewSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
                                 signedRequest)).Result;
 
-                        if (renewResponse.RenewSSLCertResponse.Result == ResultType.Success )
+                        if (renewResponse.RenewSSLCertResponse.Result.Equals(ResultType.Success) )
                         {
                             return new EnrollmentResult
                             {

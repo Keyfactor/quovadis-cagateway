@@ -8,6 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+namespace Keyfactor.AnyGateway.Quovadis.QuovadisClient
+{
+    
 
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -5723,4 +5726,5 @@ public partial class CertificateServicesSoapClient : System.ServiceModel.ClientB
         inValue.signedGetOrganisationGuidRequest = signedGetOrganisationGuidRequest;
         return ((CertificateServicesSoap)(this)).GetOrganisationGuidAsync(inValue);
     }
+}
 }

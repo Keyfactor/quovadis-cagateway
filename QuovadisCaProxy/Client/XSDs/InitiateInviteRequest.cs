@@ -639,7 +639,7 @@ public enum InviteSANFieldType {
 [System.SerializableAttribute()]
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.ComponentModel.DesignerCategoryAttribute("code")]
-public partial class EnrollKeyValuePair {
+public partial class KeyValuePair {
     
     private string keyField;
     

@@ -20,26 +20,18 @@ using System.Xml.Serialization;
 [System.SerializableAttribute()]
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.ComponentModel.DesignerCategoryAttribute("code")]
-[System.Xml.Serialization.XmlRootAttribute("RenewSSLCertRequest", Namespace="", IsNullable=false)]
-public partial class RenewSSLCertRequestType {
+[System.Xml.Serialization.XmlRootAttribute("RevokeCertificateBySerialNoRequest", Namespace="", IsNullable=false)]
+public partial class RevokeCertificateBySerialNoRequestType {
     
     private System.DateTime dateTimeField;
     
-    private string subscriberEmailAddressField;
+    private RevokeCertificateBySerialNoAccountInfo accountField;
     
-    private int certificateTypeField;
+    private RevokeCerticateBySerialNoRevocationReason reasonField;
     
-    private string cSRField;
+    private string issuerDNField;
     
-    private RenewAccountInfo accountField;
-    
-    private string serverPlatformField;
-    
-    private KeyValuePair[] customFieldsField;
-    
-    private string commentsField;
-    
-    private string transactionIdField;
+    private string serialNoField;
     
     private bool testField;
     
@@ -58,40 +50,7 @@ public partial class RenewSSLCertRequestType {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string SubscriberEmailAddress {
-        get {
-            return this.subscriberEmailAddressField;
-        }
-        set {
-            this.subscriberEmailAddressField = value;
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public int CertificateType {
-        get {
-            return this.certificateTypeField;
-        }
-        set {
-            this.certificateTypeField = value;
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string CSR {
-        get {
-            return this.cSRField;
-        }
-        set {
-            this.cSRField = value;
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public RenewAccountInfo Account {
+    public RevokeCertificateBySerialNoAccountInfo Account {
         get {
             return this.accountField;
         }
@@ -102,46 +61,34 @@ public partial class RenewSSLCertRequestType {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string ServerPlatform {
+    public RevokeCerticateBySerialNoRevocationReason Reason {
         get {
-            return this.serverPlatformField;
+            return this.reasonField;
         }
         set {
-            this.serverPlatformField = value;
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlArrayAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    [System.Xml.Serialization.XmlArrayItemAttribute("Item", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, IsNullable=false)]
-    public KeyValuePair[] CustomFields {
-        get {
-            return this.customFieldsField;
-        }
-        set {
-            this.customFieldsField = value;
+            this.reasonField = value;
         }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Comments {
+    public string IssuerDN {
         get {
-            return this.commentsField;
+            return this.issuerDNField;
         }
         set {
-            this.commentsField = value;
+            this.issuerDNField = value;
         }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string TransactionId {
+    public string SerialNo {
         get {
-            return this.transactionIdField;
+            return this.serialNoField;
         }
         set {
-            this.transactionIdField = value;
+            this.serialNoField = value;
         }
     }
     
@@ -173,11 +120,13 @@ public partial class RenewSSLCertRequestType {
 [System.SerializableAttribute()]
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.ComponentModel.DesignerCategoryAttribute("code")]
-public partial class RenewAccountInfo {
+public partial class RevokeCertificateBySerialNoAccountInfo {
     
     private string nameField;
     
     private string organisationField;
+    
+    private string organisationGuidField;
     
     /// <remarks/>
     [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
@@ -200,38 +149,33 @@ public partial class RenewAccountInfo {
             this.organisationField = value;
         }
     }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+    public string OrganisationGuid {
+        get {
+            return this.organisationGuidField;
+        }
+        set {
+            this.organisationGuidField = value;
+        }
+    }
 }
 
 /// <remarks/>
 [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
 [System.SerializableAttribute()]
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.ComponentModel.DesignerCategoryAttribute("code")]
-public partial class KeyValuePair {
-    
-    private string keyField;
-    
-    private string valueField;
+public enum RevokeCerticateBySerialNoRevocationReason {
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Key {
-        get {
-            return this.keyField;
-        }
-        set {
-            this.keyField = value;
-        }
-    }
+    keyCompromise,
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Value {
-        get {
-            return this.valueField;
-        }
-        set {
-            this.valueField = value;
-        }
-    }
+    affiliationChanged,
+    
+    /// <remarks/>
+    superseded,
+    
+    /// <remarks/>
+    cessationOfOperation,
 }

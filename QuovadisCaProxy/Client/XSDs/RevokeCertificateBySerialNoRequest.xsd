@@ -1,23 +1,23 @@
 ﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-	<xsd:element name="RevokeCertificateRequest" type="RevokeCertificateRequestType" />
-	<xsd:complexType name="RevokeCertificateRequestType">
+	<xsd:element name="RevokeCertificateBySerialNoRequest" type="RevokeCertificateBySerialNoRequestType" />
+	<xsd:complexType name="RevokeCertificateBySerialNoRequestType">
 		<xsd:sequence>
 			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="RequestPartyEmailAddress" type="xsd:string" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="Account" type="RevokeCertificateAccountInfo" minOccurs="1" maxOccurs="1" />
-			<xsd:element name="Reason" type="RevokeCerticateRevocationReason" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name="TransactionId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Account" type="RevokeCertificateBySerialNoAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="Reason" type="RevokeCerticateBySerialNoRevocationReason" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="IssuerDN" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="SerialNo" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:complexType name="RevokeCertificateAccountInfo">
+	<xsd:complexType name="RevokeCertificateBySerialNoAccountInfo">
 		<xsd:sequence>
 			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name="OrganisationGuid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:simpleType name="RevokeCerticateRevocationReason">
+	<xsd:simpleType name="RevokeCerticateBySerialNoRevocationReason">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="keyCompromise"/>
 			<xsd:enumeration value="affiliationChanged"/>
