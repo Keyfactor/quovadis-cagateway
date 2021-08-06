@@ -33,6 +33,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\QuovadisCaProxy\packages\BouncyCastle.1.8.9\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxy.AnyGateway.Core, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>..\QuovadisCaProxy\packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxy.AnyGateway.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxy.Interfaces, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>..\QuovadisCaProxy\packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxy.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxyDAL, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>..\QuovadisCaProxy\packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxyDAL.dll</HintPath>
+    </Reference>
+    <Reference Include="CommonCAProxy, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>..\QuovadisCaProxy\packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CommonCAProxy.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\QuovadisCaProxy\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Security" />
@@ -45,18 +63,40 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enrollment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Templates.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="QV_Webservices_KeyFactor.p12" />
+    <None Include="Csrs\2150.csr">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Csrs\2149.csr">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="QV_Webservices_KeyFactor.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SampleConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Csrs\2166.csr">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TransactionList.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QuovadisCaProxy\QuovadisCaProxy.csproj">
       <Project>{b823be29-7950-49fb-9239-ddbb423b08ce}</Project>
       <Name>QuovadisCaProxy</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

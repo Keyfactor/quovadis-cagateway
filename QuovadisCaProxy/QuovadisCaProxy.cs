@@ -92,7 +92,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             try
             {
                 InitiateInviteRequestType it = new InitiateInviteRequestType();
-
+                
                 var x = new XmlSerializer(it.GetType());
                 byte[] bytes;
                 using (MemoryStream stream = new MemoryStream())

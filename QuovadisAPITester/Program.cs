@@ -2,145 +2,79 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.Pkcs;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Xml.Linq;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
+using Newtonsoft.Json.Linq;
 
 namespace QuovadisAPITester
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static string BaseUrl { get; set; }
+        private static string WebServiceSigningCertDir { get; set; }
+        private static string WebServiceSigningCertPassword { get; set; }
+
+        private static void Main()
         {
-            Console.Write("Enter Function (GetTemplates , InitiateInvite):");
+            JObject obj;
+            using (var r = new StreamReader($"{Directory.GetCurrentDirectory()}\\SampleConfig.json"))
+            {
+                var json = r.ReadToEnd();
+                obj = JObject.Parse(json);
+            }
+
+            BaseUrl = (obj["CAConnection"]?["BaseUrl"] ?? "").Value<string>();
+            WebServiceSigningCertDir = (obj["CAConnection"]?["WebServiceSigningCertDir"] ?? "").Value<string>();
+            WebServiceSigningCertPassword =
+                (obj["CAConnection"]?["WebServiceSigningCertPassword"] ?? "").Value<string>();
+
+            Console.Write("Enter Function (GetTemplates , Enroll:TemplateId):");
+
             var input = Console.ReadLine();
-            switch (input)
+
+            if (input != null && input.Contains("Enroll"))
             {
-                case "GetTemplates":
-                    Console.Write(TestGetTemplates());
-                    break;
-                case "InitiateInvite":
-                    Console.Write(TestInitiateInvite());
-                    break;
+                var templateId = input.Split(':')[1];
+                var productInfo = Utilities.GetEnrollmentParameters(templateId);
+                var token = obj
+                    .Descendants()
+                    .OfType<JProperty>()
+                    .First(p => p.Value.ToString() == templateId);
+                
+                string result = string.Empty;
+
+                if (token.Parent != null)
+                {
+                    var enrollType = (token.Parent["Parameters"]?["EnrollmentType"] ?? "").Value<string>();
+                    var tempXml = (token.Parent["Parameters"]?["EnrollmentTemplate"] ?? "").Value<string>();
+                    var rdr = Utilities.GetTemplateCsr(templateId);
+                    var csr = rdr.ReadToEnd();
+                    if (enrollType == "SSLRequest")
+                    {
+                        var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(BaseUrl,
+                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                        result=enrollment.PerformEnrollment(tempXml, csr, productInfo);
+                    }
+                    else if (enrollType == "InitiateInviteRequest")
+                    {
+                        var enrollment = new Enrollment<InitiateInviteRequestType, InitiateInviteResponse1>(BaseUrl,
+                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                        result=enrollment.PerformEnrollment(tempXml, csr, productInfo);
+                    }
+                }
+                Console.Write(result);
+                XElement xElement=XElement.Parse(result);
+                string transactionId = xElement.Descendants("TransactionId").FirstOrDefault()?.Value;
+                File.AppendAllText($"{Directory.GetCurrentDirectory()}\\TransactionList.csv", transactionId + Environment.NewLine);
+
+            }
+            else if (input != null && input.Contains("GetTemplates"))
+            {
+                var t = new Templates(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                Console.Write(t.TestGetTemplates());
             }
 
-            Console.Read();
-        }
-
-        public static string TestGetTemplates()
-        {
-            GetAccountPolicyTemplateListRequestType tr = new GetAccountPolicyTemplateListRequestType();
-            tr.Account = "KeyFactor";
-            tr.DateTime=DateTime.Now;
-            tr.Test = true;
-
-
-            var x = new XmlSerializer(tr.GetType());
-            byte[] bytes;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                x.Serialize(stream, tr);
-                bytes = stream.ToArray();
-            }
-
-            Binding bind = new BasicHttpsBinding();
-            EndpointAddress ep = new EndpointAddress("https://tlclientdev.quovadisglobal.com/ws/CertificateServices.asmx");
-            var quovadisClient = new CertificateServicesSoapClient(bind, ep);
-
-            var signedRequest = BuildSignedCmsStructure("C:\\Users\\bhill\\source\\repos\\Quovadis-AnyGateway\\QuovadisAPITester\\QV_Webservices_KeyFactor.p12", "Keyfactor2019!", bytes);
-
-            var templatesResponse = Task.Run(async () =>
-                await quovadisClient.GetAccountPolicyTemplateListAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                    signedRequest)).Result;
-
-            System.IO.StringWriter writer = new System.IO.StringWriter();
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(GetAccountPolicyTemplateListResponse1));
-            serializer.Serialize(writer, templatesResponse);
-            return writer.ToString();
-        }
-
-
-        public static string TestInitiateInvite()
-        {
-
-            InitiateInviteRequestType ii = new InitiateInviteRequestType();
-            InviteAccountInfo account = new InviteAccountInfo();
-            CertContentFieldsType cf=new CertContentFieldsType();
-            RegistrantInfoType rf=new RegistrantInfoType();
-            ii.AdministratorEmailAddress = "brian.hill@keyfactor.com";
-            rf.ConfirmPassword = "Password12!";
-            rf.Password = "Password12!";
-            //rf.FirstName = "Brian";
-            //rf.LastName = "Hill";
-            //rf.Email = "brian@boingy.com";
-            //rf.PrimaryPhone = "4444441141";
-            cf.CN = "testcert";
-            cf.C = "US";
-            cf.O = "KeyFactor";
-            cf.OU = new string[]{"IT Department"};
-            //cf.E = "admin@boingy.com";
-            account.Name = "KeyFactor";
-            account.Organisation = "KeyFactor";
-            ii.Account = account;
-            ii.DateTime = DateTime.Now;
-            //ii.Test = true;
-            ii.TemplateId = 2166;
-            ii.RegistrantInfo = rf;
-            ii.CertContentFields = cf;
-            ii.ValidityPeriod = 1;
-
-            var x = new XmlSerializer(ii.GetType());
-            byte[] bytes;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                x.Serialize(stream, ii);
-                bytes = stream.ToArray();
-            }
-
-            //var baseUrl = "https://tlclientdev.quovadisglobal.com/ws/CertificateServices.asmx";
-            Binding bind = new BasicHttpsBinding();
-            EndpointAddress ep = new EndpointAddress("https://tlclientdev.quovadisglobal.com/ws/CertificateServices.asmx");
-            var quovadisClient = new CertificateServicesSoapClient(bind, ep);
-
-            var signedRequest = BuildSignedCmsStructure("C:\\Users\\bhill\\source\\repos\\Quovadis-AnyGateway\\QuovadisAPITester\\QV_Webservices_KeyFactor.p12", "Keyfactor2019!", bytes);
-
-            var initiateResponse = Task.Run(async () =>
-                await quovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                    signedRequest)).Result;
-
-            System.IO.StringWriter writer = new System.IO.StringWriter();
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(InitiateInviteResponse1));
-            serializer.Serialize(writer, initiateResponse);
-            return writer.ToString();
-        }
-
-
-        public static string BuildSignedCmsStructure(string p12FileLocation, string p12Password, byte[] dataToSign)
-        {
-            //Retrieve web service signing certificate
-            X509Certificate2 signingCert = null;
-            var cert2Collection = new X509Certificate2Collection();
-            cert2Collection.Import(p12FileLocation, p12Password, X509KeyStorageFlags.Exportable);
-            foreach (var cert in cert2Collection)
-            {
-                if (!cert.HasPrivateKey) continue;
-                signingCert = cert;
-            }
-            //Generate signed CMS payload
-            var contentInfo = new ContentInfo(dataToSign);
-            var signedCms = new SignedCms(contentInfo);
-            var cmsSigner = new CmsSigner(signingCert);
-            signedCms.ComputeSignature(cmsSigner);
-            //Create base64 encoded signed CMS payload
-            byte[] signedStructure = signedCms.Encode();
-            var encodedText = Convert.ToBase64String(signedStructure);
-            return encodedText;
+            Console.ReadLine();
         }
     }
 }

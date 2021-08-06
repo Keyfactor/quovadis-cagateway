@@ -23,21 +23,20 @@
     "BaseUrl": "http://tle.quovadisglobal.com/webservices"
   },
   "Templates": {
-    "Quovadis Business Ssl": {
-      "ProductID": "Quovadis Business Ssl",
-      "Parameters": {}
+    "SMIME P12 no registrant interaction": {
+      "ProductID": "2166",
+      "Parameters": {
+		"ProductName":"SMIME P12 no registrant interaction",
+		"EnrollmentType":"InitiateInviteRequest",
+		"EnrollmentTemplate":"<InitiateInviteRequest xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\\\" xmlns:xsd=\"http:\/\/www.w3.org\/2001\/XMLSchema\\\"><DateTime>{DateTime.Now}<\/DateTime><AdministratorEmailAddress>{Enrollment|Admin Email}<\/AdministratorEmailAddress><TemplateId>2166<\/TemplateId><CertContentFields><CN>CSR|CommonName<\/CN><C>CSR|Country<\/C><O>{CSR|Organisation}<\/O><OU><Field>{CSR|Organisation Unit}<\/Field><\/OU><\/CertContentFields><RegistrantInfo><Password>{Enrollment|Password}<\/Password><ConfirmPassword>Enrollment|Password<\/ConfirmPassword><\/RegistrantInfo><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>{Enrollment|Organisation Name}<\/Organisation><\/Account><\/InitiateInviteRequest>"
+		}
     },
-    "Quovadis Code Signing": {
+    "SMIME P12 no registrant interaction": {
       "ProductID": "Quovadis Code Signing",
-      "Parameters": {}
-    },
-    "Quovadis Extended Validation Ssl": {
-      "ProductID": "Quovadis Extended Validation Ssl",
-      "Parameters": {}
-    },
-    "Quovadis Qualified Website Authentication Certificate": {
-      "ProductID": "Quovadis Qualified Website Authentication Certificate",
-      "Parameters": {}
+      "Parameters": {
+	     "ProductName":"SMIME P12 no registrant interaction",
+	     "EnrollmentTemplate":"<RequestSSLCertRequest xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\" xmlns:xsd=\"http:\/\/www.w3.org\/2001\/XMLSchema\"><DateTime>{DateTime.Now}<\/DateTime><SubscriberEmailAddress>{Enrollment|Subscriber Email}<\/SubscriberEmailAddress><CertificateType>2150<\/CertificateType><CSR>{CSR|Raw}<\/CSR><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>Enrollment|Organisation Name<\/Organisation><\/Account><ServerPlatform>Microsoft IIS 7.0<\/ServerPlatform><\/RequestSSLCertRequest>"
+	  }
     }
   },
   "CertificateManagers": null,

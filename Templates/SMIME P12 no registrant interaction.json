@@ -1,0 +1,18 @@
+{
+  "Id": 999999,
+  "CommonName": "SMIME P12 no registrant interaction",
+  "TemplateName": "SMIME P12 no registrant interaction",
+  "Oid": "Replace OID",
+  "KeySize": "2048",
+  "KeyType": "RSA",
+  "ForestRoot": "keyfactor.lab",
+  "FriendlyName": "Replace Friendly Name",
+  "KeyRetention": "AfterExpiration",
+  "KeyRetentionDays": 55,
+  "KeyArchival": false,
+  "AllowedEnrollmentTypes": 7,
+  "TemplateRegexes": [],
+  "UseAllowedRequesters": false,
+  "AllowedRequesters": [],
+  "DisplayName": "Replace Display Name"
+}
