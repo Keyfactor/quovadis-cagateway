@@ -48,7 +48,7 @@ namespace QuovadisAPITester
                     productInfo.ProductParameters.Add("Organisation Name", "KeyFactor");
                     break;
                 case "2150":
-                    productInfo.ProductParameters.Add("Subscriber Email", "brian.hill@keyfactor.com");
+                    productInfo.ProductParameters.Add("Subscriber Email", "bhill@keyfactor.com");
                     productInfo.ProductParameters.Add("Organisation Name", "KeyFactor");
                     break;
                 case "2149":
