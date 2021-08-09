@@ -27,51 +27,60 @@ namespace QuovadisAPITester
         
         public string PerformEnrollment(string tempXml,string csr, EnrollmentProductInfo enrollParams)
         {
-            
-            var ret = BuildRequestXml(tempXml, csr, enrollParams);
-            TextReader txtRdr = new StringReader(ret);
-            var mySerializer = new XmlSerializer(typeof(T));
-            var req = (T)mySerializer.Deserialize(txtRdr);
 
-            var x = new XmlSerializer(req.GetType());
-            byte[] bytes;
-            using (MemoryStream stream = new MemoryStream())
+            try
             {
-                x.Serialize(stream, req);
-                bytes = stream.ToArray();
+                var ret = BuildRequestXml(tempXml, csr, enrollParams);
+                TextReader txtRdr = new StringReader(ret);
+                var mySerializer = new XmlSerializer(typeof(T));
+                var req = (T)mySerializer.Deserialize(txtRdr);
+
+                var x = new XmlSerializer(req.GetType());
+                byte[] bytes;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    x.Serialize(stream, req);
+                    bytes = stream.ToArray();
+                }
+
+                Binding bind = new BasicHttpsBinding();
+                EndpointAddress ep = new EndpointAddress(baseUrl);
+                var quovadisClient = new CertificateServicesSoapClient(bind, ep);
+
+                var signedRequest = Utilities.BuildSignedCmsStructure(wsSigningCertDir, wsSigningCertPwd, bytes);
+                object response = null;
+
+                if (typeof(T).Name == "InitiateInviteRequestType")
+                {
+                    response = Task.Run(async () =>
+                        await quovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
+                            signedRequest)).Result;
+
+                }
+                else if (typeof(T).Name == "RequestSSLCertRequestType")
+                {
+                    response = Task.Run(async () =>
+                        await quovadisClient.RequestSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
+                            signedRequest)).Result;
+
+                }
+
+                StringWriter reqWriter = new StringWriter();
+                var reqSerializer = new XmlSerializer(typeof(T));
+                reqSerializer.Serialize(reqWriter, req);
+
+                StringWriter resWriter = new StringWriter();
+                var serializer = new XmlSerializer(typeof(TR));
+
+                serializer.Serialize(resWriter, response ?? "");
+                return resWriter.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
-            Binding bind = new BasicHttpsBinding();
-            EndpointAddress ep = new EndpointAddress(baseUrl);
-            var quovadisClient = new CertificateServicesSoapClient(bind, ep);
-
-            var signedRequest = Utilities.BuildSignedCmsStructure(wsSigningCertDir, wsSigningCertPwd, bytes);
-            object response = null;
-
-            if (typeof(T).Name == "InitiateInviteRequestType")
-            {
-                response = Task.Run(async () =>
-                    await quovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                        signedRequest)).Result;
-
-            }
-            else if (typeof(T).Name == "RequestSSLCertRequestType")
-            {
-                response = Task.Run(async () =>
-                     await quovadisClient.RequestSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                         signedRequest)).Result;
-
-            }
-
-            StringWriter reqWriter = new StringWriter();
-            var reqSerializer = new XmlSerializer(typeof(T));
-            reqSerializer.Serialize(reqWriter, req);
-            
-            StringWriter resWriter = new StringWriter();
-            var serializer = new XmlSerializer(typeof(TR));
-
-            serializer.Serialize(resWriter, response ?? "");
-            return resWriter.ToString();
         }
 
         public static string BuildRequestXml(string templateXml, string csrString, EnrollmentProductInfo enrollParams)
