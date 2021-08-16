@@ -15,76 +15,79 @@ using System.Xml.Serialization;
 // 
 
 
-/// <remarks/>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-[System.SerializableAttribute()]
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.ComponentModel.DesignerCategoryAttribute("code")]
-[System.Xml.Serialization.XmlRootAttribute("GetAccountPolicyTemplateDetailsRequest", Namespace="", IsNullable=false)]
-public partial class GetAccountPolicyTemplateDetailsRequestType {
-    
-    private System.DateTime dateTimeField;
-    
-    private string accountField;
-    
-    private int pTIDField;
-    
-    private bool testField;
-    
-    private bool testFieldSpecified;
-    
+namespace Keyfactor.AnyGateway.Quovadis.Client.XSDs
+{
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public System.DateTime DateTime {
-        get {
-            return this.dateTimeField;
-        }
-        set {
-            this.dateTimeField = value;
-        }
-    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [XmlRoot("GetAccountPolicyTemplateDetailsRequest", Namespace="", IsNullable=false)]
+    public partial class GetAccountPolicyTemplateDetailsRequestType {
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Account {
-        get {
-            return this.accountField;
-        }
-        set {
-            this.accountField = value;
-        }
-    }
+        private System.DateTime dateTimeField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public int PTID {
-        get {
-            return this.pTIDField;
-        }
-        set {
-            this.pTIDField = value;
-        }
-    }
+        private string accountField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public bool Test {
-        get {
-            return this.testField;
-        }
-        set {
-            this.testField = value;
-        }
-    }
+        private int pTIDField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool TestSpecified {
-        get {
-            return this.testFieldSpecified;
+        private bool testField;
+    
+        private bool testFieldSpecified;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public System.DateTime DateTime {
+            get {
+                return this.dateTimeField;
+            }
+            set {
+                this.dateTimeField = value;
+            }
         }
-        set {
-            this.testFieldSpecified = value;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Account {
+            get {
+                return this.accountField;
+            }
+            set {
+                this.accountField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int PTID {
+            get {
+                return this.pTIDField;
+            }
+            set {
+                this.pTIDField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool Test {
+            get {
+                return this.testField;
+            }
+            set {
+                this.testField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlIgnore()]
+        public bool TestSpecified {
+            get {
+                return this.testFieldSpecified;
+            }
+            set {
+                this.testFieldSpecified = value;
+            }
         }
     }
 }

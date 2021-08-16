@@ -15,89 +15,92 @@ using System.Xml.Serialization;
 // 
 
 
-/// <remarks/>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-[System.SerializableAttribute()]
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.ComponentModel.DesignerCategoryAttribute("code")]
-[System.Xml.Serialization.XmlRootAttribute("RequestSSLCertResponse", Namespace="", IsNullable=false)]
-public partial class RequestSSLCertResponseType {
-    
-    private ResultType resultField;
-    
-    private System.DateTime dateTimeField;
-    
-    private string errorCodeField;
-    
-    private string messageField;
-    
-    private string detailsField;
-    
-    private string transactionIdField;
-    
+namespace Keyfactor.AnyGateway.Quovadis.Client.XSDs
+{
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public ResultType Result {
-        get {
-            return this.resultField;
-        }
-        set {
-            this.resultField = value;
-        }
-    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [XmlRoot("RequestSSLCertResponse", Namespace="", IsNullable=false)]
+    public partial class RequestSSLCertResponseType {
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public System.DateTime DateTime {
-        get {
-            return this.dateTimeField;
-        }
-        set {
-            this.dateTimeField = value;
-        }
-    }
+        private ResultType resultField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string ErrorCode {
-        get {
-            return this.errorCodeField;
-        }
-        set {
-            this.errorCodeField = value;
-        }
-    }
+        private System.DateTime dateTimeField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Message {
-        get {
-            return this.messageField;
-        }
-        set {
-            this.messageField = value;
-        }
-    }
+        private string errorCodeField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Details {
-        get {
-            return this.detailsField;
-        }
-        set {
-            this.detailsField = value;
-        }
-    }
+        private string messageField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string TransactionId {
-        get {
-            return this.transactionIdField;
+        private string detailsField;
+    
+        private string transactionIdField;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ResultType Result {
+            get {
+                return this.resultField;
+            }
+            set {
+                this.resultField = value;
+            }
         }
-        set {
-            this.transactionIdField = value;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public System.DateTime DateTime {
+            get {
+                return this.dateTimeField;
+            }
+            set {
+                this.dateTimeField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string ErrorCode {
+            get {
+                return this.errorCodeField;
+            }
+            set {
+                this.errorCodeField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Message {
+            get {
+                return this.messageField;
+            }
+            set {
+                this.messageField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Details {
+            get {
+                return this.detailsField;
+            }
+            set {
+                this.detailsField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string TransactionId {
+            get {
+                return this.transactionIdField;
+            }
+            set {
+                this.transactionIdField = value;
+            }
         }
     }
 }

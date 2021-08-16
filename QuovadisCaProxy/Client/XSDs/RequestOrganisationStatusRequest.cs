@@ -15,76 +15,79 @@ using System.Xml.Serialization;
 // 
 
 
-/// <remarks/>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
-[System.SerializableAttribute()]
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.ComponentModel.DesignerCategoryAttribute("code")]
-[System.Xml.Serialization.XmlRootAttribute("RequestOrganisationRequestStatusRequest", Namespace="", IsNullable=false)]
-public partial class RequestOrganisationRequestStatusRequestType {
-    
-    private System.DateTime dateTimeField;
-    
-    private string accountField;
-    
-    private string transactionIdField;
-    
-    private bool testField;
-    
-    private bool testFieldSpecified;
-    
+namespace Keyfactor.AnyGateway.Quovadis.Client.XSDs
+{
     /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public System.DateTime DateTime {
-        get {
-            return this.dateTimeField;
-        }
-        set {
-            this.dateTimeField = value;
-        }
-    }
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1590.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [XmlRoot("RequestOrganisationRequestStatusRequest", Namespace="", IsNullable=false)]
+    public partial class RequestOrganisationRequestStatusRequestType {
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string Account {
-        get {
-            return this.accountField;
-        }
-        set {
-            this.accountField = value;
-        }
-    }
+        private System.DateTime dateTimeField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public string TransactionId {
-        get {
-            return this.transactionIdField;
-        }
-        set {
-            this.transactionIdField = value;
-        }
-    }
+        private string accountField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
-    public bool Test {
-        get {
-            return this.testField;
-        }
-        set {
-            this.testField = value;
-        }
-    }
+        private string transactionIdField;
     
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool TestSpecified {
-        get {
-            return this.testFieldSpecified;
+        private bool testField;
+    
+        private bool testFieldSpecified;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public System.DateTime DateTime {
+            get {
+                return this.dateTimeField;
+            }
+            set {
+                this.dateTimeField = value;
+            }
         }
-        set {
-            this.testFieldSpecified = value;
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Account {
+            get {
+                return this.accountField;
+            }
+            set {
+                this.accountField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string TransactionId {
+            get {
+                return this.transactionIdField;
+            }
+            set {
+                this.transactionIdField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlElement(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool Test {
+            get {
+                return this.testField;
+            }
+            set {
+                this.testField = value;
+            }
+        }
+    
+        /// <remarks/>
+        [XmlIgnore()]
+        public bool TestSpecified {
+            get {
+                return this.testFieldSpecified;
+            }
+            set {
+                this.testFieldSpecified = value;
+            }
         }
     }
 }

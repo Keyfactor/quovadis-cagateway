@@ -10,7 +10,7 @@ using CAProxy.AnyGateway.Models;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 using Org.BouncyCastle.Asn1.Pkcs;
 
-namespace QuovadisAPITester
+namespace QuovadisAPITester.Operations
 {
     public class Enrollment<T,TR>
     {

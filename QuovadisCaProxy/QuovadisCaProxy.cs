@@ -10,7 +10,10 @@ using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
 using CSS.PKI;
 using System.Xml.Serialization;
+using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
+using ResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.ResultType;
+using RevokeResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.RevokeResultType;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {

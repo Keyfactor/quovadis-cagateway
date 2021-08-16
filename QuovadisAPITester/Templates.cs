@@ -4,6 +4,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
 namespace QuovadisAPITester

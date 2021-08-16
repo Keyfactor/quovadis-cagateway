@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using CAProxy.AnyGateway.Models;
 
 namespace QuovadisAPITester
@@ -61,6 +62,17 @@ namespace QuovadisAPITester
             }
 
             return productInfo;
+        }
+
+        public static string AddSerialNumberDashes(string s, char c, int n)
+        {
+            StringBuilder sb = new StringBuilder(s.Length + (s.Length % n) + 1);
+            for (int i = 1; i <= s.Length; ++i)
+            {
+                sb.Append(s[i-1]);
+                if (i % n == 0) sb.Append(c);
+            }
+            return sb.ToString();
         }
     }
 }
