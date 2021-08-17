@@ -25,10 +25,10 @@ namespace QuovadisAPITester.Operations
         }
 
 
-        public string RevokeCertificate(X509Certificate2 actualCert,string account,string revokeReason)
+        public string RevokeCertificate(X509Certificate2 actualCert, string account, string revokeReason)
         {
-            RevokeCertificateBySerialNoRequestType revokeRequest = new RevokeCertificateBySerialNoRequestType();
-            var revokeAccount = new RevokeCertificateBySerialNoAccountInfo()
+            var revokeRequest = new RevokeCertificateBySerialNoRequestType();
+            var revokeAccount = new RevokeCertificateBySerialNoAccountInfo
             {
                 Name = account,
                 Organisation = account
@@ -36,8 +36,10 @@ namespace QuovadisAPITester.Operations
             revokeRequest.Account = revokeAccount;
             revokeRequest.DateTime = DateTime.Now;
             revokeRequest.Reason = GetRevokeReason(revokeReason);
-            revokeRequest.SerialNo = Utilities.AddSerialNumberDashes(actualCert.SerialNumber,'-',2).TrimEnd('-').ToLower();
-            revokeRequest.IssuerDN = string.Join(",", actualCert.Issuer.Split(',').Reverse()).Trim().Replace(",C=",", C=");
+            revokeRequest.SerialNo =
+                Utilities.AddSerialNumberDashes(actualCert.SerialNumber, '-', 2).TrimEnd('-').ToLower();
+            revokeRequest.IssuerDN =
+                string.Join(",", actualCert.Issuer.Split(',').Reverse()).Trim().Replace(",C=", ", C=");
 
             var x = new XmlSerializer(revokeRequest.GetType());
             byte[] bytes;
@@ -57,16 +59,15 @@ namespace QuovadisAPITester.Operations
                 await quovadisClient.RevokeCertificateBySerialNoAsync(APIVersion.v1_0, ContentEncoding.UTF8,
                     signedRequest)).Result;
 
-            StringWriter reqWriter = new StringWriter();
+            var reqWriter = new StringWriter();
             var reqSerializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoRequestType));
             reqSerializer.Serialize(reqWriter, revokeRequest);
 
-            StringWriter resWriter = new StringWriter();
+            var resWriter = new StringWriter();
             var serializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoResponse1));
 
             serializer.Serialize(resWriter, certStatusResponse);
-            return "Request: " + reqWriter.ToString() + " Response:" + resWriter.ToString();
-
+            return "Request: " + reqWriter + " Response:" + resWriter;
         }
 
         private RevokeCerticateBySerialNoRevocationReason GetRevokeReason(string revokeReason)
@@ -82,7 +83,6 @@ namespace QuovadisAPITester.Operations
                 default:
                     return RevokeCerticateBySerialNoRevocationReason.cessationOfOperation;
             }
-
         }
     }
 }

@@ -3,7 +3,11 @@ using System.IO;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 using CAProxy.AnyGateway.Models;
+using Org.BouncyCastle.Asn1.Pkcs;
+using ContentInfo = System.Security.Cryptography.Pkcs.ContentInfo;
 
 namespace QuovadisAPITester
 {
@@ -36,23 +40,27 @@ namespace QuovadisAPITester
             return File.OpenText($"{Directory.GetCurrentDirectory()}\\Csrs\\{templateId}.csr");
         }
 
-        public static EnrollmentProductInfo GetEnrollmentParameters(string templateId)
+        public static EnrollmentProductInfo GetEnrollmentParameters(int templateId)
         {
             EnrollmentProductInfo productInfo = new EnrollmentProductInfo();
 
             switch (templateId)
             {
-                case "2166":
+                case 2166:
                     productInfo.ProductParameters.Add("Admin Email", "brian.hill@keyfactor.com");
                     productInfo.ProductParameters.Add("Password", "Password12!");
                     productInfo.ProductParameters.Add("ConfirmPassword", "Password12!");
                     productInfo.ProductParameters.Add("Organisation Name", "KeyFactor");
                     break;
-                case "2150":
+                case 2150:
                     productInfo.ProductParameters.Add("Subscriber Email", "bhill@keyfactor.com");
                     productInfo.ProductParameters.Add("Organisation Name", "KeyFactor");
                     break;
-                case "2149":
+                case 2151:
+                    productInfo.ProductParameters.Add("Subscriber Email", "bhill@keyfactor.com");
+                    productInfo.ProductParameters.Add("Organisation Name", "KeyFactor");
+                    break;
+                case 2149:
                     productInfo.ProductParameters.Add("Admin Email", "brian.hill@keyfactor.com");
                     productInfo.ProductParameters.Add("Password", "Password12!");
                     productInfo.ProductParameters.Add("ConfirmPassword", "Password12!");
@@ -73,6 +81,72 @@ namespace QuovadisAPITester
                 if (i % n == 0) sb.Append(c);
             }
             return sb.ToString();
+        }
+
+        public static string GetValueFromCsr(string[] csrFieldValueArray, CertificationRequestInfo csr)
+        {
+            var csrVals = csr.Subject.ToString().Split(',');
+            foreach (var val in csrVals)
+            {
+                var nmValPair = val.Split('=');
+
+                if (csrFieldValueArray[1] == nmValPair[0])
+                {
+                    return nmValPair[1];
+                }
+            }
+
+            return "";
+        }
+
+        public static string BuildRequestXml(string templateXml, string csrString, EnrollmentProductInfo enrollParams,bool isRenewal)
+        {
+            using (TextReader sr = new StringReader(csrString))
+            {
+                var reader = new Org.BouncyCastle.OpenSsl.PemReader(sr);
+                var req = reader.ReadObject() as Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest;
+                var csr = req?.GetCertificationRequestInfo();
+                var finalXml = templateXml;
+
+                XmlReader rdr = XmlReader.Create(new StringReader(templateXml));
+                while (rdr.Read())
+                {
+                    if (rdr.NodeType == XmlNodeType.Element)
+                    {
+                        Console.WriteLine("Name: " + rdr.LocalName);
+                    }
+                    if (rdr.NodeType == XmlNodeType.Text)
+                    {
+                        Console.WriteLine("Value: " + rdr.Value);
+                        var currentElementValue = rdr.Value;
+                        var fieldValueArray = currentElementValue.Split('|');
+                        if (fieldValueArray[0].ToUpper() == "ENROLLMENT" || fieldValueArray[0] == "DateTime.Now")
+                        {
+                            finalXml = finalXml.Replace(currentElementValue, currentElementValue == "DateTime.Now" ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK") : enrollParams.ProductParameters[fieldValueArray[1]]);
+                        }
+                        else if (fieldValueArray[0].ToUpper() == "CSR")
+                        {
+                            var csrFieldValueArray = currentElementValue.Split('|');
+                            if (csrFieldValueArray[1].ToUpper() == "RAW")
+                            {
+                                finalXml = finalXml.Replace(currentElementValue, csrString);
+                            }
+                            else
+                            {
+                                var csrValue = GetValueFromCsr(csrFieldValueArray, csr);
+                                var pattern = @"\b" + currentElementValue.Replace("|", "\\|") + @"\b";
+                                finalXml = Regex.Replace(finalXml, pattern, csrValue);
+                            }
+                        }
+                    }
+
+                }
+
+                if (isRenewal)
+                    finalXml=finalXml.Replace("RequestSSLCertRequest", "RenewSSLCertRequest");
+                return finalXml;
+            }
+
         }
     }
 }

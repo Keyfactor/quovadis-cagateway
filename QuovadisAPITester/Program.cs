@@ -3,13 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 using Newtonsoft.Json.Linq;
 using QuovadisAPITester.Operations;
-
+using CertificateStatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusResultType;
+using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType;
+using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
+using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
 
 namespace QuovadisAPITester
 {
@@ -34,19 +35,21 @@ namespace QuovadisAPITester
                 (obj["CAConnection"]?["WebServiceSigningCertPassword"] ?? "").Value<string>();
             Console.WriteLine("Choose Function");
             Console.WriteLine("GetTemplates");
-            Console.WriteLine("Enroll:TemplateId, Download:TransactionId,emailAddress,Account,EnrollType");
+            Console.WriteLine("Enroll:TemplateId");
+            Console.WriteLine("Download: TransactionId,emailAddress,Account,EnrollType");
             Console.WriteLine("Revoke:TransactionId,emailAddress,Account,EnrollType,RevokeReason");
+            Console.WriteLine("Renew:TemplateId,TransactionId");
 
             var input = Console.ReadLine();
 
             if (input != null && input.Contains("Enroll"))
             {
-                var templateId = input.Split(':')[1];
+                var templateId = Convert.ToInt32(input.Split(':')[1]);
                 var productInfo = Utilities.GetEnrollmentParameters(templateId);
                 var token = obj
                     .Descendants()
                     .OfType<JProperty>()
-                    .First(p => p.Value.ToString() == templateId);
+                    .First(p => p.Value.ToString() == templateId.ToString());
 
                 var result = string.Empty;
 
@@ -54,7 +57,7 @@ namespace QuovadisAPITester
                 {
                     var enrollType = (token.Parent["Parameters"]?["EnrollmentType"] ?? "").Value<string>();
                     var tempXml = (token.Parent["Parameters"]?["EnrollmentTemplate"] ?? "").Value<string>();
-                    var rdr = Utilities.GetTemplateCsr(templateId);
+                    var rdr = Utilities.GetTemplateCsr(templateId.ToString());
                     var csr = rdr.ReadToEnd();
                     if (enrollType == "SSLRequest")
                     {
@@ -71,10 +74,6 @@ namespace QuovadisAPITester
                 }
 
                 Console.Write(result);
-                var xElement = XElement.Parse(result);
-                var transactionId = xElement.Descendants("TransactionId").FirstOrDefault()?.Value;
-                File.AppendAllText($"{Directory.GetCurrentDirectory()}\\TransactionList.csv",
-                    transactionId + Environment.NewLine);
             }
             else if (input != null && input.Contains("GetTemplates"))
             {
@@ -90,7 +89,7 @@ namespace QuovadisAPITester
                 var account = valArray[2];
                 var enrollType = valArray[3];
 
-                var actualCert=GetX509Certificate(enrollType, emailAddress, account, transactionId);
+                var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
                 Console.Write(actualCert.SubjectName);
             }
             else if (input != null && input.Contains("Revoke"))
@@ -106,21 +105,41 @@ namespace QuovadisAPITester
                 var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
                 if (actualCert != null)
                 {
-                    Revocation revoke=new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                    var revoke = new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
                     //perform the revoke
-                    Console.Write(revoke.RevokeCertificate(actualCert,account, revokeReason));
+                    Console.Write(revoke.RevokeCertificate(actualCert, account, revokeReason));
                 }
-                
             }
             else if (input != null && input.Contains("Renew"))
             {
+                var paramArray = input.Split(':')[1];
+                var valArray = paramArray.Split(',');
+                var templateId = Convert.ToInt32(valArray[0]);
+                var transactionId = valArray[1];
+                var productInfo = Utilities.GetEnrollmentParameters(templateId);
+
+
+                var token = obj
+                    .Descendants()
+                    .OfType<JProperty>()
+                    .First(p => p.Value.ToString() == templateId.ToString());
+
+                if (token.Parent != null)
+                {
+                    var tempXml = (token.Parent["Parameters"]?["EnrollmentTemplate"] ?? "").Value<string>();
+                    var rdr = Utilities.GetTemplateCsr(templateId.ToString());
+
+                    var renewal = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                    Console.Write(renewal.RenewCertificate(tempXml, rdr.ReadToEnd(), productInfo, transactionId));
+                }
             }
 
 
             Console.ReadLine();
         }
 
-        private static X509Certificate2 GetX509Certificate(string enrollType, string emailAddress, string account, string transactionId)
+        private static X509Certificate2 GetX509Certificate(string enrollType, string emailAddress, string account,
+            string transactionId)
         {
             X509Certificate2 actualCert = null;
 
@@ -131,9 +150,9 @@ namespace QuovadisAPITester
                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                 var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
                 if (certResponse.RequestSSLCertStatusResponse.Status ==
-                    Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType.Valid &&
+                    StatusType.Valid &&
                     certResponse.RequestSSLCertStatusResponse.Result ==
-                    Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType.Success)
+                    StatusResultType.Success)
                 {
                     var certResult =
                         new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(BaseUrl,
@@ -151,9 +170,9 @@ namespace QuovadisAPITester
                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                 var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
                 if (certResponse.RequestCertificateStatusResponse.Status ==
-                    Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType.Valid &&
+                    CertificateStatusType.Valid &&
                     certResponse.RequestCertificateStatusResponse.Result ==
-                    Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusResultType.Success)
+                    CertificateStatusResultType.Success)
                 {
                     var certResult =
                         new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,

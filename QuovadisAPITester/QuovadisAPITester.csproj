@@ -65,14 +65,18 @@
   <ItemGroup>
     <Compile Include="Operations\QuovadisCertificate.cs" />
     <Compile Include="Operations\Enrollment.cs" />
+    <Compile Include="Operations\Renewal.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Operations\Revocation.cs" />
-    <Compile Include="Templates.cs" />
+    <Compile Include="Operations\Templates.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Csrs\2151.csr">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Csrs\2150.csr">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

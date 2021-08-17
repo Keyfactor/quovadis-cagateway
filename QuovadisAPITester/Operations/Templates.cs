@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
-namespace QuovadisAPITester
+namespace QuovadisAPITester.Operations
 {
     public class Templates
     {

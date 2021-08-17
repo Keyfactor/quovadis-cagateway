@@ -30,7 +30,7 @@
       "Parameters": {
         "ProductName": "SMIME P12 no registrant interaction",
         "EnrollmentType": "InitiateInviteRequest",
-        "EnrollmentTemplate": "<InitiateInviteRequest xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\\\" xmlns:xsd=\"http:\/\/www.w3.org\/2001\/XMLSchema\\\"><ValidityPeriod>1</ValidityPeriod><DateTime>DateTime.Now<\/DateTime><AdministratorEmailAddress>Enrollment|Admin Email<\/AdministratorEmailAddress><TemplateId>2166<\/TemplateId><CertContentFields><CN>CSR|CN<\/CN><C>CSR|C<\/C><O>CSR|O<\/O><OU><Field>CSR|OU<\/Field><\/OU><\/CertContentFields><RegistrantInfo><Password>Enrollment|Password<\/Password><ConfirmPassword>Enrollment|Password<\/ConfirmPassword><\/RegistrantInfo><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>Enrollment|Organisation Name<\/Organisation><\/Account><\/InitiateInviteRequest>"
+        "EnrollmentTemplate": "<InitiateInviteRequest><ValidityPeriod>1</ValidityPeriod><DateTime>DateTime.Now<\/DateTime><AdministratorEmailAddress>Enrollment|Admin Email<\/AdministratorEmailAddress><TemplateId>2166<\/TemplateId><CertContentFields><CN>CSR|CN<\/CN><C>CSR|C<\/C><O>CSR|O<\/O><OU><Field>CSR|OU<\/Field><\/OU><\/CertContentFields><RegistrantInfo><Password>Enrollment|Password<\/Password><ConfirmPassword>Enrollment|Password<\/ConfirmPassword><\/RegistrantInfo><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>Enrollment|Organisation Name<\/Organisation><\/Account><\/InitiateInviteRequest>"
       }
     },
     "QV Business SSL 10 SAN - Subscriber Interaction": {
@@ -38,7 +38,15 @@
       "Parameters": {
         "ProductName": "QV Business SSL 10 SAN - Subscriber Interaction",
         "EnrollmentType": "SSLRequest",
-        "EnrollmentTemplate": "<RequestSSLCertRequest xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\\\" xmlns:xsd=\"http:\/\/www.w3.org\/2001\/XMLSchema\\\"><DateTime>DateTime.Now</DateTime>\t<SubscriberEmailAddress>Enrollment|Subscriber Email</SubscriberEmailAddress>\t<CertFields>\t\t<CN>CSR|CN</CN>\t\t<O>CSR|O</O>\t\t<OU>\t\t\t<Field>CSR|OU</Field>\t\t</OU>\t\t<SAN>\t\t\t<Field>\t\t\t\t<Type>DnsName</Type>\t\t\t\t<Value>CSR|CN</Value>\t\t\t</Field>\t\t</SAN>\t</CertFields>\t<CSR>CSR|Raw</CSR>\t<CertificateType>2150</CertificateType>\t<Account>\t\t<Name>Enrollment|Organisation Name</Name>\t\t<Organisation>Enrollment|Organisation Name</Organisation>\t</Account>\t<ServerPlatform>Microsoft IIS7</ServerPlatform></RequestSSLCertRequest>"
+        "EnrollmentTemplate": "<RequestSSLCertRequest><DateTime>DateTime.Now</DateTime>\t<SubscriberEmailAddress>Enrollment|Subscriber Email</SubscriberEmailAddress>\t<CertFields>\t\t<CN>CSR|CN</CN>\t\t<O>CSR|O</O>\t\t<OU>\t\t\t<Field>CSR|OU</Field>\t\t</OU>\t\t<SAN>\t\t\t<Field>\t\t\t\t<Type>DnsName</Type>\t\t\t\t<Value>CSR|CN</Value>\t\t\t</Field>\t\t</SAN>\t</CertFields>\t<CSR>CSR|Raw</CSR>\t<CertificateType>2150</CertificateType>\t<Account>\t\t<Name>Enrollment|Organisation Name</Name>\t\t<Organisation>Enrollment|Organisation Name</Organisation>\t</Account>\t<ServerPlatform>Microsoft IIS7</ServerPlatform></RequestSSLCertRequest>"
+      }
+    },
+    "QV Business SSL 10 SAN - Admin generate": {
+      "ProductID": "2151",
+      "Parameters": {
+        "ProductName": "QV Business SSL 10 SAN - Admin generate",
+        "EnrollmentType": "SSLRequest",
+        "EnrollmentTemplate": "<RequestSSLCertRequest><DateTime>DateTime.Now</DateTime>\t<SubscriberEmailAddress>Enrollment|Subscriber Email</SubscriberEmailAddress>\t<CertFields>\t\t<CN>CSR|CN</CN>\t\t<O>CSR|O</O>\t\t<OU>\t\t\t<Field>CSR|OU</Field>\t\t</OU>\t\t<SAN>\t\t\t<Field>\t\t\t\t<Type>DnsName</Type>\t\t\t\t<Value>CSR|CN</Value>\t\t\t</Field>\t\t</SAN>\t</CertFields>\t\t<CertificateType>2151</CertificateType>\t<CSR>CSR|Raw</CSR>\t<Account>\t<Name>Enrollment|Organisation Name</Name>\t\t<Organisation>Enrollment|Organisation Name</Organisation>\t</Account>\t<ServerPlatform>Microsoft IIS7</ServerPlatform></RequestSSLCertRequest>"
       }
     },
     "SMIME Client Side Key Gen": {
@@ -46,7 +54,7 @@
       "Parameters": {
         "ProductName": "SMIME Client Side Key Gen",
         "EnrollmentType": "InitiateInviteRequest",
-        "EnrollmentTemplate": "<InitiateInviteRequest xmlns:xsi=\"http:\/\/www.w3.org\/2001\/XMLSchema-instance\\\" xmlns:xsd=\"http:\/\/www.w3.org\/2001\/XMLSchema\\\"><ValidityPeriod>1</ValidityPeriod><Country>Enrollment|Country<\/Country><DateTime>DateTime.Now<\/DateTime><AdministratorEmailAddress>Enrollment|Admin Email<\/AdministratorEmailAddress><TemplateId>2166<\/TemplateId><CertContentFields><CN>CSR|CN<\/CN><C>CSR|C<\/C><O>CSR|O<\/O><OU><Field>CSR|OU<\/Field><\/OU><\/CertContentFields><RegistrantInfo><Password>Enrollment|Password<\/Password><ConfirmPassword>Enrollment|Password<\/ConfirmPassword><\/RegistrantInfo><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>Enrollment|Organisation Name<\/Organisation><\/Account><\/InitiateInviteRequest>"
+        "EnrollmentTemplate": "<InitiateInviteRequest><ValidityPeriod>1</ValidityPeriod><Country>Enrollment|Country<\/Country><DateTime>DateTime.Now<\/DateTime><AdministratorEmailAddress>Enrollment|Admin Email<\/AdministratorEmailAddress><TemplateId>2166<\/TemplateId><CertContentFields><CN>CSR|CN<\/CN><C>CSR|C<\/C><O>CSR|O<\/O><OU><Field>CSR|OU<\/Field><\/OU><\/CertContentFields><RegistrantInfo><Password>Enrollment|Password<\/Password><ConfirmPassword>Enrollment|Password<\/ConfirmPassword><\/RegistrantInfo><Account><Name>Enrollment|Organisation Name<\/Name><Organisation>Enrollment|Organisation Name<\/Organisation><\/Account><\/InitiateInviteRequest>"
       }
     }
   },
