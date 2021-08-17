@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CAProxy.AnyGateway;
@@ -10,49 +12,53 @@ using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
 using CSS.PKI;
 using System.Xml.Serialization;
+using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
+using Newtonsoft.Json.Linq;
+using CertificateStatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusResultType;
+using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType;
+using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
 using ResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.ResultType;
 using RevokeResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.RevokeResultType;
+using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
+using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
     public class QuovadisCaProxy : BaseCAConnector
     {
-        private readonly RequestManager _requestManager;
+        private readonly RequestManager requestManager;
 
         public QuovadisCaProxy()
         {
-            _requestManager = new RequestManager();
+            requestManager = new RequestManager();
         }
 
-
         private CertificateServicesSoapClient QuovadisClient { get; set; }
-
+        private string WebServiceSigningCertDir { get; set; }
         private string BaseUrl { get; set; }
+        private string WebServiceSigningCertPassword { get; set; }
+
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
-            try
+           /* try
             {
-                RevokeCertificateRequestType rt = new RevokeCertificateRequestType();
+                /var paramArray = input.Split(':')[1];
+                var valArray = paramArray.Split(',');
+                var transactionId = valArray[0];
+                var emailAddress = valArray[1];
+                var account = valArray[2];
+                var enrollType = valArray[3];
+                var revokeReason = valArray[4];
 
-                var x = new XmlSerializer(rt.GetType());
-                byte[] bytes;
-                using (MemoryStream stream = new MemoryStream())
+                var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
+                if (actualCert != null)
                 {
-                    x.Serialize(stream, rt);
-                    bytes = stream.ToArray();
-                }
-
-                var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
-
-                var revokeResponse =
-                    Task.Run(async () => await QuovadisClient.RevokeSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8, signedRequest)).Result;
-
-                if (revokeResponse.RevokeSSLCertResponse.Result.Equals(RevokeResultType.Failure))
-                {
-                    return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
+                    var revoke = new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                    //perform the revoke
+                    Console.Write(revoke.RevokeCertificate(actualCert, account, revokeReason));
                 }
             }
             catch (Exception e)
@@ -61,7 +67,9 @@ namespace Keyfactor.AnyGateway.Quovadis
             }
             
             throw new Exception("Revoke failed");
+            */
 
+           return 0;
         }
 
         [Obsolete]
@@ -104,40 +112,82 @@ namespace Keyfactor.AnyGateway.Quovadis
                     bytes = stream.ToArray();
                 }
 
-                var signedRequest = _requestManager.BuildSignedCmsStructure("", "", bytes);
-
                 switch (enrollmentType)
                 {
                     case RequestUtilities.EnrollmentType.New:
-                        var initiateResponse = Task.Run(async () =>
-                            await QuovadisClient.InitiateInviteAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                                signedRequest)).Result;
-
-                        if (initiateResponse.InitiateInviteResponse.Result.Equals(ResultType.Success))
+                        try
                         {
-                            return new EnrollmentResult
-                            {
-                                Status = 9, //success
-                                StatusMessage =
-                                    $"Enrollment Succeeded with Id {initiateResponse.InitiateInviteResponse.TransactionId}"
-                            };
-                        }
+                            var templateId = productInfo.ProductID;
+                            Logger.Trace($"Entering New Enrollment with ProductId {templateId}");
 
+                            if (templateId != null)
+                            {
+                                var enrollType = productInfo.ProductParameters["EnrollmentType"];
+                                var tempXml = productInfo.ProductParameters["EnrollmentTemplate"];
+                                Logger.Trace($"Enroll Type {enrollType}");
+                                Logger.Trace($"Temp XML Retrieved {tempXml}");
+
+                                if (enrollType == "SSLRequest")
+                                {
+                                    var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(BaseUrl,
+                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                    var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
+
+                                    if (result.RequestSSLCertResponse.Result == Quovadis.QuovadisClient.ResultType.Success)
+                                    {
+                                        return new EnrollmentResult
+                                        {
+                                            Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                            CARequestID = result.RequestSSLCertResponse.TransactionId,
+                                            StatusMessage = $"Enrollment Succeeded with Id {result.RequestSSLCertResponse.Details}"
+                                        };
+                                    }
+                                    return new EnrollmentResult
+                                    {
+                                        Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
+                                        StatusMessage = $"SSL Cert Enrollment Failed with message {result.RequestSSLCertResponse.Details}"
+                                    };
+                                }
+
+                                if (enrollType == "InitiateInviteRequest")
+                                {
+                                    var enrollment = new Enrollment<InitiateInviteRequestType, InitiateInviteResponse1>(BaseUrl,
+                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                    var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
+
+                                    if (result.InitiateInviteResponse.Result == InviteResultType.Success)
+                                    {
+                                        return new EnrollmentResult
+                                        {
+                                            Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                            CARequestID = result.InitiateInviteResponse.TransactionId,
+                                            StatusMessage = $"Enrollment Succeeded with Id {result.InitiateInviteResponse.Details}"
+                                        };
+                                    }
+
+                                    return new EnrollmentResult
+                                    {
+                                        Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
+                                        StatusMessage = $"Cert Enrollment Failed with message {result.InitiateInviteResponse.Details}"
+                                    };
+
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error($"Error Occurred in New Enrollment {e.Message}");
+                            throw;
+                        }
                         break;
                     case RequestUtilities.EnrollmentType.Renew:
-                        var renewResponse = Task.Run(async () =>
-                            await QuovadisClient.RenewSSLCertAsync(APIVersion.v2_0, ContentEncoding.UTF8,
-                                signedRequest)).Result;
+                        /*
+                        var transactionId = certificateDataReader.GetCertificateRecord();
 
-                        if (renewResponse.RenewSSLCertResponse.Result.Equals(ResultType.Success) )
-                        {
-                            return new EnrollmentResult
-                            {
-                                Status = 9, //success
-                                StatusMessage =
-                                    $"Enrollment Succeeded with Id {renewResponse.RenewSSLCertResponse.TransactionId}"
-                            };
-                        }
+                        var tempRenewXml = productInfo.ProductParameters["EnrollmentTemplate"];
+                        var renewal = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                        var renewResponse=renewal.RenewCertificate(tempRenewXml, csr, productInfo, transactionId);
+                        */
                         break;
                     case RequestUtilities.EnrollmentType.Reissue:
 
@@ -185,6 +235,54 @@ namespace Keyfactor.AnyGateway.Quovadis
         public override void ValidateProductInfo(EnrollmentProductInfo productInfo,
             Dictionary<string, object> connectionInfo)
         {
+        }
+
+        private X509Certificate2 GetX509Certificate(string enrollType, string emailAddress, string account,
+        string transactionId)
+        {
+            X509Certificate2 actualCert = null;
+
+            if (enrollType == "SSL")
+            {
+                var certStatus =
+                    new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
+                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
+                if (certResponse.RequestSSLCertStatusResponse.Status ==
+                    StatusType.Valid &&
+                    certResponse.RequestSSLCertStatusResponse.Result ==
+                    StatusResultType.Success)
+                {
+                    var certResult =
+                        new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(BaseUrl,
+                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                    var cert = certResult.RequestCertificate(emailAddress, account, transactionId);
+                    var certString = cert.RetrieveSSLCertResponse.Certificate;
+                    actualCert = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+                }
+            }
+            else
+            {
+                var certStatus =
+                    new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
+                        BaseUrl,
+                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
+                if (certResponse.RequestCertificateStatusResponse.Status ==
+                    CertificateStatusType.Valid &&
+                    certResponse.RequestCertificateStatusResponse.Result ==
+                    CertificateStatusResultType.Success)
+                {
+                    var certResult =
+                        new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
+                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                    var cert = certResult.RequestCertificate(emailAddress, account, transactionId);
+                    var certString = cert.RetrieveCertificateResponse.Certificate;
+                    actualCert = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+                }
+            }
+
+            return actualCert;
         }
     }
 }
