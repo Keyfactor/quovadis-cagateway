@@ -1,7 +1,7 @@
 {
   "Id": 999999,
-  "CommonName": "QV Business SSL 10 SAN - Subscriber Interaction",
-  "TemplateName": "QV Business SSL 10 SAN - Subscriber Interaction",
+  "CommonName": "QV Business SSL 10 SAN - Admin generate",
+  "TemplateName": "QV Business SSL 10 SAN - Admin generate",
   "Oid": "Replace OID",
   "KeySize": "2048",
   "KeyType": "RSA",
@@ -11,21 +11,8 @@
   "KeyRetentionDays": 55,
   "KeyArchival": false,
   "EnrollmentFields": [
-    {
-      "Id": 2228540,
-      "Name": "Validity Period",
-      "Options": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "DataType": 2
-    },
 	{
-      "Id": 2228541,
+      "Id": 2229541,
       "Name": "Subscriber Email",
       "Options": [
         ""
@@ -33,7 +20,7 @@
       "DataType": 1
     },
 	{
-      "Id": 2228544,
+      "Id": 2229544,
       "Name": "Organization Name",
       "Options": [
         ""

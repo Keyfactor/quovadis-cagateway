@@ -1,5 +1,5 @@
 ﻿ProductName,Code,Vendor,Product Type,IsMultiDomain
 SMIME P12 no registrant interaction,SMIME P12 no registrant interaction,Quovadis,DV,No
-SMIME CSR-based no registrant interaction,SMIME CSR-based no registrant interaction,Quovadis,DV,No
-SMIME P12,SMIME P12,Quovadis,DV,No
+QV Business SSL 10 SAN - Subscriber Interaction,QV Business SSL 10 SAN - Subscriber Interaction,Quovadis,DV,No
+QV Business SSL 10 SAN - Admin generate,QV Business SSL 10 SAN - Admin generate,Quovadis,DV,No
 SMIME Client Side Key Gen,SMIME Client Side Key Gen,Quovadis,DV,No

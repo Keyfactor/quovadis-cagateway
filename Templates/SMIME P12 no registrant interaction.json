@@ -10,6 +10,45 @@
   "KeyRetention": "AfterExpiration",
   "KeyRetentionDays": 55,
   "KeyArchival": false,
+  "EnrollmentFields": [
+    {
+      "Id": 2222340,
+      "Name": "Validity Period",
+      "Options": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "DataType": 2
+    },
+    {
+      "Id": 2222341,
+      "Name": "Admin Email",
+      "Options": [
+        ""
+      ],
+      "DataType": 1
+    },
+    {
+      "Id": 2222342,
+      "Name": "Password",
+      "Options": [
+        ""
+      ],
+      "DataType": 1
+    },
+    {
+      "Id": 2222343,
+      "Name": "Organization Name",
+      "Options": [
+        ""
+      ],
+      "DataType": 1
+    }
+  ],
   "AllowedEnrollmentTypes": 7,
   "TemplateRegexes": [],
   "UseAllowedRequesters": false,
