@@ -85,7 +85,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             CertificateAuthoritySyncInfo certificateAuthoritySyncInfo,
             CancellationToken cancelToken)
         {
-            throw new InvalidOperationException();
+            
         }
 
         [Obsolete]
@@ -139,7 +139,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                                         {
                                             Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
                                             CARequestID = result.RequestSSLCertResponse.TransactionId,
-                                            StatusMessage = $"Enrollment Succeeded with Id {result.RequestSSLCertResponse.Details}"
+                                            StatusMessage = $"Enrollment Succeeded with Id {result.RequestSSLCertResponse.Details}",
                                         };
                                     }
                                     return new EnrollmentResult
@@ -214,13 +214,17 @@ namespace Keyfactor.AnyGateway.Quovadis
         
         public override CAConnectorCertificate GetSingleRecord(string caRequestId)
         {
-            return new CAConnectorCertificate();
+            return new CAConnectorCertificate() 
+            { 
+                CARequestID=caRequestId
+            };
         }
 
         public override void Initialize(ICAConnectorConfigProvider configProvider)
         {
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
-            //QuovadisClient = new CertificateServicesSoapClient(;
+            WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
+            WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
 
         }
 
