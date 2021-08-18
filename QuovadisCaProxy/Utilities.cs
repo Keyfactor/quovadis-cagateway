@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml;
 using CAProxy.AnyGateway.Models;
 using Org.BouncyCastle.Asn1.Pkcs;
@@ -16,6 +13,9 @@ namespace Keyfactor.AnyGateway.Quovadis
 {
     public static class Utilities
     {
+        public static Func<string, string> Pemify = ss =>
+            ss.Length <= 64 ? ss : ss.Substring(0, 64) + "\n" + Pemify(ss.Substring(64));
+
         public static string BuildSignedCmsStructure(string p12FileLocation, string p12Password, byte[] dataToSign)
         {
             //Retrieve web service signing certificate
@@ -68,7 +68,11 @@ namespace Keyfactor.AnyGateway.Quovadis
 
         public static string BuildRequestXml(string templateXml, string csrString, EnrollmentProductInfo enrollParams, bool isRenewal)
         {
-            using (TextReader sr = new StringReader(csrString))
+            var pemCert =Utilities.Pemify(csrString);
+            pemCert = "-----BEGIN CERTIFICATE REQUEST-----\n" + pemCert;
+            pemCert += "\n-----END CERTIFICATE REQUEST-----";
+
+            using (TextReader sr = new StringReader(pemCert))
             {
                 var reader = new Org.BouncyCastle.OpenSsl.PemReader(sr);
                 var req = reader.ReadObject() as Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest;
