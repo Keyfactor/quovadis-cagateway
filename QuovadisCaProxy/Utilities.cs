@@ -9,6 +9,7 @@ using System.Xml;
 using CAProxy.AnyGateway.Data;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
+using CSS.Common.Logging;
 using Org.BouncyCastle.Asn1.Pkcs;
 using ContentInfo = System.Security.Cryptography.Pkcs.ContentInfo;
 
@@ -48,7 +49,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             var encodedText = Convert.ToBase64String(signedStructure);
             return encodedText;
         }
-
+                
         public static string AddSerialNumberDashes(string s, char c, int n)
         {
             StringBuilder sb = new StringBuilder(s.Length + (s.Length % n) + 1);
@@ -85,48 +86,57 @@ namespace Keyfactor.AnyGateway.Quovadis
 
             using (TextReader sr = new StringReader(pemCert))
             {
-                var reader = new Org.BouncyCastle.OpenSsl.PemReader(sr);
-                var req = reader.ReadObject() as Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest;
-                var csr = req?.GetCertificationRequestInfo();
-                var finalXml = templateXml;
-
-                XmlReader rdr = XmlReader.Create(new StringReader(templateXml));
-                while (rdr.Read())
+                try
                 {
-                    if (rdr.NodeType == XmlNodeType.Element)
+                    var reader = new Org.BouncyCastle.OpenSsl.PemReader(sr);
+                    var req = reader.ReadObject() as Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest;
+                    var csr = req?.GetCertificationRequestInfo();
+                    var finalXml = templateXml;
+
+                    XmlReader rdr = XmlReader.Create(new StringReader(templateXml));
+                    while (rdr.Read())
                     {
-                        Console.WriteLine("Name: " + rdr.LocalName);
-                    }
-                    if (rdr.NodeType == XmlNodeType.Text)
-                    {
-                        Console.WriteLine("Value: " + rdr.Value);
-                        var currentElementValue = rdr.Value;
-                        var fieldValueArray = currentElementValue.Split('|');
-                        if (fieldValueArray[0].ToUpper() == "ENROLLMENT" || fieldValueArray[0] == "DateTime.Now")
+                        if (rdr.NodeType == XmlNodeType.Element)
                         {
-                            finalXml = finalXml.Replace(currentElementValue, currentElementValue == "DateTime.Now" ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK") : enrollParams.ProductParameters[fieldValueArray[1]]);
+                            Console.WriteLine("Name: " + rdr.LocalName);
                         }
-                        else if (fieldValueArray[0].ToUpper() == "CSR")
+                        if (rdr.NodeType == XmlNodeType.Text)
                         {
-                            var csrFieldValueArray = currentElementValue.Split('|');
-                            if (csrFieldValueArray[1].ToUpper() == "RAW")
+                            Console.WriteLine("Value: " + rdr.Value);
+                            var currentElementValue = rdr.Value;
+                            var fieldValueArray = currentElementValue.Split('|');
+                            if (fieldValueArray[0].ToUpper() == "ENROLLMENT" || fieldValueArray[0] == "DateTime.Now")
                             {
-                                finalXml = finalXml.Replace(currentElementValue, csrString);
+                                finalXml = finalXml.Replace(currentElementValue, currentElementValue == "DateTime.Now" ? DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssK") : enrollParams.ProductParameters[fieldValueArray[1]]);
                             }
-                            else
+                            else if (fieldValueArray[0].ToUpper() == "CSR")
                             {
-                                var csrValue = GetValueFromCsr(csrFieldValueArray, csr);
-                                var pattern = @"\b" + currentElementValue.Replace("|", "\\|") + @"\b";
-                                finalXml = Regex.Replace(finalXml, pattern, csrValue);
+                                var csrFieldValueArray = currentElementValue.Split('|');
+                                if (csrFieldValueArray[1].ToUpper() == "RAW")
+                                {
+                                    finalXml = finalXml.Replace(currentElementValue, csrString);
+                                }
+                                else
+                                {
+                                    var csrValue = GetValueFromCsr(csrFieldValueArray, csr);
+                                    var pattern = @"\b" + currentElementValue.Replace("|", "\\|") + @"\b";
+                                    finalXml = Regex.Replace(finalXml, pattern, csrValue);
+                                }
                             }
                         }
+
                     }
 
+                    if (isRenewal)
+                        finalXml = finalXml.Replace("RequestSSLCertRequest", "RenewSSLCertRequest");
+                    return finalXml;
+                }
+                catch(Exception e)
+                {
+                    throw;
                 }
 
-                if (isRenewal)
-                    finalXml = finalXml.Replace("RequestSSLCertRequest", "RenewSSLCertRequest");
-                return finalXml;
+
             }
 
         }

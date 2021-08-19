@@ -25,7 +25,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
             this.wsSigningCertPwd = wsSigningCertPwd;
         }
 
-        public RenewSSLCertResponse1 RenewCertificate(string tempXml, string csr, EnrollmentProductInfo enrollParams,
+        public async Task<RenewSSLCertResponse1> RenewCertificate(string tempXml, string csr, EnrollmentProductInfo enrollParams,
             string transactionId)
         {
             try

@@ -19,6 +19,7 @@ using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.Certi
 using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
 using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
+using System.Data.SqlClient;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
@@ -82,7 +83,93 @@ namespace Keyfactor.AnyGateway.Quovadis
             CancellationToken cancelToken)
         {
             Logger.Debug($"Entering Synchronization process");
-            var gatewayConnectionString = Utilities.GetGatewayConnection(certificateDataReader);
+
+            Logger.Trace($"Full Sync? {certificateAuthoritySyncInfo.DoFullSync}");
+            Logger.MethodEntry(ILogExtensions.MethodLogLevel.Debug);
+            try
+            {
+                var certs = new BlockingCollection<ICertificateResponse>(100);
+                CscGlobalClient.SubmitCertificateListRequestAsync(certs, cancelToken);
+
+                foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
+                {
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        Logger.Error("Synchronize was canceled.");
+                        break;
+                    }
+
+                    try
+                    {
+                        Logger.Trace($"Took Certificate ID {currentResponseItem?.Uuid} from Queue");
+                        var certStatus = _requestManager.MapReturnStatus(currentResponseItem?.Status);
+
+                        //Keyfactor sync only seems to work when there is a valid cert and I can only get Active valid certs from Csc Global
+                        if (certStatus == Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.ISSUED) ||
+                            certStatus == Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED))
+                        {
+                            //One click renewal/reissue won't work for this implementation so there is an option to disable it by not syncing back template
+                            var productId = "CscGlobal";
+                            if (EnableTemplateSync) productId = currentResponseItem?.CertificateType;
+
+                            var fileContent =
+                                Encoding.ASCII.GetString(
+                                    Convert.FromBase64String(currentResponseItem?.Certificate ?? string.Empty));
+                            var fileContent2 =
+                                Encoding.UTF8.GetString(
+                                    Convert.FromBase64String(fileContent)); //Double base64 Encoded for some reason
+
+                            Logger.Trace($"Certificate Content: {fileContent2}");
+
+                            if (fileContent2.Length > 0)
+                            {
+                                var certData = fileContent2.Replace("\r\n", string.Empty);
+                                var splitCerts =
+                                    certData.Split(new[] { "-----END CERTIFICATE-----", "-----BEGIN CERTIFICATE-----" },
+                                        StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var cert in splitCerts)
+                                    if (!cert.Contains(".crt"))
+                                    {
+                                        Logger.Trace($"Split Cert Value: {cert}");
+
+                                        var currentCert = new X509Certificate2(Encoding.ASCII.GetBytes(cert));
+                                        if (!currentCert.Subject.Contains("AAA Certificate Services") &&
+                                            !currentCert.Subject.Contains("USERTrust RSA Certification Authority") &&
+                                            !currentCert.Subject.Contains("Trusted Secure Certificate Authority 5") &&
+                                            !currentCert.Subject.Contains("AddTrust External CA Root") &&
+                                            !currentCert.Subject.Contains("Trusted Secure Certificate Authority DV"))
+                                            blockingBuffer.Add(new CAConnectorCertificate
+                                            {
+                                                CARequestID = $"{currentResponseItem?.Uuid}-{currentCert.SerialNumber}",
+                                                Certificate = cert,
+                                                SubmissionDate = currentResponseItem?.OrderDate == null
+                                                    ? Convert.ToDateTime(currentCert.NotBefore)
+                                                    : Convert.ToDateTime(currentResponseItem.OrderDate),
+                                                Status = certStatus,
+                                                ProductID = productId
+                                            }, cancelToken);
+                                    }
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Logger.Error("Synchronize was canceled.");
+                        break;
+                    }
+                }
+            }
+            catch (AggregateException aggEx)
+            {
+                Logger.Error("Csc Global Synchronize Task failed!");
+                Logger.MethodExit(ILogExtensions.MethodLogLevel.Debug);
+                // ReSharper disable once PossibleIntendedRethrow
+                throw aggEx;
+            }
+
+            Logger.MethodExit(ILogExtensions.MethodLogLevel.Debug);
+
+
         }
 
         [Obsolete]
