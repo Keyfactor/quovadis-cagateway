@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using CAProxy.AnyGateway.Data;
+using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using Org.BouncyCastle.Asn1.Pkcs;
 using ContentInfo = System.Security.Cryptography.Pkcs.ContentInfo;
@@ -13,6 +16,14 @@ namespace Keyfactor.AnyGateway.Quovadis
 {
     public static class Utilities
     {
+        public static string GetGatewayConnection(ICertificateDataReader cdr)
+        {
+            Type baseType = cdr.GetType();
+            var field = baseType.GetField("a", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            return ((CAProxy.AnyGateway.DatabaseConfigurationProvider)field.GetValue(cdr)).ConnectionString;
+        }
+
         public static Func<string, string> Pemify = ss =>
             ss.Length <= 64 ? ss : ss.Substring(0, 64) + "\n" + Pemify(ss.Substring(64));
 

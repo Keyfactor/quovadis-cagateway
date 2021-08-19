@@ -5,7 +5,6 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using CAProxy.AnyGateway;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
@@ -15,12 +14,9 @@ using System.Xml.Serialization;
 using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
-using Newtonsoft.Json.Linq;
 using CertificateStatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusResultType;
 using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType;
 using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
-using ResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.ResultType;
-using RevokeResultType = Keyfactor.AnyGateway.Quovadis.Client.XSDs.RevokeResultType;
 using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
 
@@ -39,7 +35,7 @@ namespace Keyfactor.AnyGateway.Quovadis
         private string WebServiceSigningCertDir { get; set; }
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
-
+        private ICAConnectorConfigProvider Config { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
@@ -85,7 +81,8 @@ namespace Keyfactor.AnyGateway.Quovadis
             CertificateAuthoritySyncInfo certificateAuthoritySyncInfo,
             CancellationToken cancelToken)
         {
-            
+            Logger.Debug($"Entering Synchronization process");
+            var gatewayConnectionString = Utilities.GetGatewayConnection(certificateDataReader);
         }
 
         [Obsolete]
@@ -103,7 +100,6 @@ namespace Keyfactor.AnyGateway.Quovadis
             try
             {
                 InitiateInviteRequestType it = new InitiateInviteRequestType();
-                
                 var x = new XmlSerializer(it.GetType());
                 byte[] bytes;
                 using (MemoryStream stream = new MemoryStream())
@@ -129,6 +125,8 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                 if (enrollType == "SSLRequest")
                                 {
+                                    productInfo.ProductParameters.Add("EnrollType", "SSLRequest");
+
                                     var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
@@ -225,7 +223,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
             WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
-
+            Config = configProvider;
         }
 
         public override void Ping()
