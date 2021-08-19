@@ -12,6 +12,14 @@
   "KeyArchival": false,
   "EnrollmentFields": [
     {
+      "Id": 2228339,
+      "Name": "EnrollmentType",
+      "Options": [
+        "SSLRequest"
+      ],
+      "DataType": 2
+    },
+    {
       "Id": 2228540,
       "Name": "Validity Period",
       "Options": [
