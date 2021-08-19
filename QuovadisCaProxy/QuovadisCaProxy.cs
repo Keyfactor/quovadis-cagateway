@@ -125,8 +125,6 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                 if (enrollType == "SSLRequest")
                                 {
-                                    productInfo.ProductParameters.Add("EnrollType", "SSLRequest");
-
                                     var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
