@@ -12,6 +12,14 @@
   "KeyArchival": false,
   "EnrollmentFields": [
     {
+      "Id": 2222339,
+      "Name": "Enrollment Type",
+      "Options": [
+        "InitiateInviteRequest"
+      ],
+      "DataType": 2
+    },
+    {
       "Id": 2222340,
       "Name": "Validity Period",
       "Options": [
@@ -42,7 +50,7 @@
     },
     {
       "Id": 2222343,
-      "Name": "Organization Name",
+      "Name": "Organisation Name",
       "Options": [
         ""
       ],
