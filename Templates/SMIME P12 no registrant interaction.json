@@ -13,7 +13,7 @@
   "EnrollmentFields": [
     {
       "Id": 2222339,
-      "Name": "EnrollmentType",
+      "Name": "Enrollment Type",
       "Options": [
         "InitiateInviteRequest"
       ],
