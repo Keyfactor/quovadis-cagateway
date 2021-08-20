@@ -87,11 +87,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\Operations\CertificateList.cs" />
+    <Compile Include="Client\Operations\Gateway.cs" />
     <Compile Include="Client\Operations\Enrollment.cs" />
     <Compile Include="Client\Operations\QuovadisCertificate.cs" />
     <Compile Include="Client\Operations\Renewal.cs" />
     <Compile Include="Client\Operations\Revocation.cs" />
+    <Compile Include="Client\Operations\Templates.cs" />
     <Compile Include="Client\QuovadisClient.cs" />
     <Compile Include="Client\XSDs\AddSubscriberRequest.cs">
       <DependentUpon>AddSubscriberRequest.xsd</DependentUpon>
@@ -243,6 +244,10 @@
       <DependentUpon>RevokeSSLCertResponse.xsd</DependentUpon>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="Models\Attribute.cs" />
+    <Compile Include="Models\Certificate.cs" />
+    <Compile Include="Models\GatewayItem.cs" />
+    <Compile Include="Interfaces\IGatewayItem.cs" />
     <Compile Include="QuovadisCaProxy.cs" />
     <Compile Include="Exceptions\RetryCountExceededException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -368,8 +373,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

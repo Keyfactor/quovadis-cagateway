@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -10,7 +9,6 @@ using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
 using CSS.PKI;
-using System.Xml.Serialization;
 using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
@@ -19,24 +17,16 @@ using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.Certi
 using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
 using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
-using System.Data.SqlClient;
+using CSS.Common.Logging;
+using Keyfactor.AnyGateway.Quovadis.Models;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
     public class QuovadisCaProxy : BaseCAConnector
     {
-        private readonly RequestManager requestManager;
-
-        public QuovadisCaProxy()
-        {
-            requestManager = new RequestManager();
-        }
-
-        private CertificateServicesSoapClient QuovadisClient { get; set; }
         private string WebServiceSigningCertDir { get; set; }
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
-        private ICAConnectorConfigProvider Config { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
@@ -83,13 +73,13 @@ namespace Keyfactor.AnyGateway.Quovadis
             CancellationToken cancelToken)
         {
             Logger.Debug($"Entering Synchronization process");
-
             Logger.Trace($"Full Sync? {certificateAuthoritySyncInfo.DoFullSync}");
-            Logger.MethodEntry(ILogExtensions.MethodLogLevel.Debug);
+
             try
             {
-                var certs = new BlockingCollection<ICertificateResponse>(100);
-                CscGlobalClient.SubmitCertificateListRequestAsync(certs, cancelToken);
+                var certs = new BlockingCollection<GatewayItem>(100);
+                Gateway gw=new Gateway();
+                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader);
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
                 {
@@ -101,54 +91,73 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                     try
                     {
-                        Logger.Trace($"Took Certificate ID {currentResponseItem?.Uuid} from Queue");
-                        var certStatus = _requestManager.MapReturnStatus(currentResponseItem?.Status);
+                        Logger.Trace($"Took Certificate ID {currentResponseItem?.Id} from Queue");
 
-                        //Keyfactor sync only seems to work when there is a valid cert and I can only get Active valid certs from Csc Global
-                        if (certStatus == Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.ISSUED) ||
-                            certStatus == Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED))
+
+                        if (currentResponseItem?.RequestType == "SSLRequest")
                         {
-                            //One click renewal/reissue won't work for this implementation so there is an option to disable it by not syncing back template
-                            var productId = "CscGlobal";
-                            if (EnableTemplateSync) productId = currentResponseItem?.CertificateType;
-
-                            var fileContent =
-                                Encoding.ASCII.GetString(
-                                    Convert.FromBase64String(currentResponseItem?.Certificate ?? string.Empty));
-                            var fileContent2 =
-                                Encoding.UTF8.GetString(
-                                    Convert.FromBase64String(fileContent)); //Double base64 Encoded for some reason
-
-                            Logger.Trace($"Certificate Content: {fileContent2}");
-
-                            if (fileContent2.Length > 0)
+                            var certStatus =
+                                new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
+                                    WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                            var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                currentResponseItem.Account, currentResponseItem.CaRequestId);
+                            if (certResponse.RequestSSLCertStatusResponse.Status ==
+                                StatusType.Valid |
+                                certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked &&
+                                certResponse.RequestSSLCertStatusResponse.Result ==
+                                StatusResultType.Success)
                             {
-                                var certData = fileContent2.Replace("\r\n", string.Empty);
-                                var splitCerts =
-                                    certData.Split(new[] { "-----END CERTIFICATE-----", "-----BEGIN CERTIFICATE-----" },
-                                        StringSplitOptions.RemoveEmptyEntries);
-                                foreach (var cert in splitCerts)
-                                    if (!cert.Contains(".crt"))
-                                    {
-                                        Logger.Trace($"Split Cert Value: {cert}");
+                                var certResult =
+                                    new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(
+                                        BaseUrl,
+                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                var cert = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                    currentResponseItem.Account, currentResponseItem.CaRequestId);
+                                var certString = cert.RetrieveSSLCertResponse.Certificate;
+                                var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
 
-                                        var currentCert = new X509Certificate2(Encoding.ASCII.GetBytes(cert));
-                                        if (!currentCert.Subject.Contains("AAA Certificate Services") &&
-                                            !currentCert.Subject.Contains("USERTrust RSA Certification Authority") &&
-                                            !currentCert.Subject.Contains("Trusted Secure Certificate Authority 5") &&
-                                            !currentCert.Subject.Contains("AddTrust External CA Root") &&
-                                            !currentCert.Subject.Contains("Trusted Secure Certificate Authority DV"))
-                                            blockingBuffer.Add(new CAConnectorCertificate
-                                            {
-                                                CARequestID = $"{currentResponseItem?.Uuid}-{currentCert.SerialNumber}",
-                                                Certificate = cert,
-                                                SubmissionDate = currentResponseItem?.OrderDate == null
-                                                    ? Convert.ToDateTime(currentCert.NotBefore)
-                                                    : Convert.ToDateTime(currentResponseItem.OrderDate),
-                                                Status = certStatus,
-                                                ProductID = productId
-                                            }, cancelToken);
-                                    }
+                                blockingBuffer.Add(new CAConnectorCertificate
+                                {
+                                    CARequestID = $"{currentResponseItem.CaRequestId}",
+                                    Certificate = certString,
+                                    SubmissionDate = currentResponseItem.SubmissionDate,
+                                    Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
+                                        .Status),
+                                    ProductID = currentResponseItem.TemplateName
+                                }, cancelToken);
+
+                            }
+                        }
+                        else
+                        {
+                            var certStatus =
+                                new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
+                                    BaseUrl,
+                                    WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                            var certResponse = certStatus.RequestCertificate(currentResponseItem?.SubscriberEmail,
+                                currentResponseItem?.Account, currentResponseItem?.CaRequestId);
+                            if (certResponse.RequestCertificateStatusResponse.Status ==
+                                CertificateStatusType.Valid &&
+                                certResponse.RequestCertificateStatusResponse.Result ==
+                                CertificateStatusResultType.Success)
+                            {
+                                var certResult =
+                                    new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
+                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                var cert = certResult.RequestCertificate(currentResponseItem?.SubscriberEmail,
+                                    currentResponseItem?.Account, currentResponseItem?.CaRequestId);
+                                var certString = cert.RetrieveCertificateResponse.Certificate;
+                                var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+
+                                blockingBuffer.Add(new CAConnectorCertificate
+                                {
+                                    CARequestID = $"{currentResponseItem?.CaRequestId}",
+                                    Certificate = certString,
+                                    SubmissionDate = currentResponseItem?.SubmissionDate,
+                                    Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
+                                        .Status),
+                                    ProductID = currentResponseItem?.TemplateName
+                                }, cancelToken);
                             }
                         }
                     }
@@ -186,14 +195,6 @@ namespace Keyfactor.AnyGateway.Quovadis
         {
             try
             {
-                InitiateInviteRequestType it = new InitiateInviteRequestType();
-                var x = new XmlSerializer(it.GetType());
-                byte[] bytes;
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    x.Serialize(stream, it);
-                    bytes = stream.ToArray();
-                }
 
                 switch (enrollmentType)
                 {
@@ -216,7 +217,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
 
-                                    if (result.RequestSSLCertResponse.Result == Quovadis.QuovadisClient.ResultType.Success)
+                                    if (result.RequestSSLCertResponse.Result == QuovadisClient.ResultType.Success)
                                     {
                                         return new EnrollmentResult
                                         {
@@ -308,7 +309,6 @@ namespace Keyfactor.AnyGateway.Quovadis
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
             WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
-            Config = configProvider;
         }
 
         public override void Ping()
@@ -324,52 +324,6 @@ namespace Keyfactor.AnyGateway.Quovadis
         {
         }
 
-        private X509Certificate2 GetX509Certificate(string enrollType, string emailAddress, string account,
-        string transactionId)
-        {
-            X509Certificate2 actualCert = null;
-
-            if (enrollType == "SSL")
-            {
-                var certStatus =
-                    new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
-                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
-                if (certResponse.RequestSSLCertStatusResponse.Status ==
-                    StatusType.Valid &&
-                    certResponse.RequestSSLCertStatusResponse.Result ==
-                    StatusResultType.Success)
-                {
-                    var certResult =
-                        new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(BaseUrl,
-                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                    var cert = certResult.RequestCertificate(emailAddress, account, transactionId);
-                    var certString = cert.RetrieveSSLCertResponse.Certificate;
-                    actualCert = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-                }
-            }
-            else
-            {
-                var certStatus =
-                    new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
-                        BaseUrl,
-                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                var certResponse = certStatus.RequestCertificate(emailAddress, account, transactionId);
-                if (certResponse.RequestCertificateStatusResponse.Status ==
-                    CertificateStatusType.Valid &&
-                    certResponse.RequestCertificateStatusResponse.Result ==
-                    CertificateStatusResultType.Success)
-                {
-                    var certResult =
-                        new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
-                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                    var cert = certResult.RequestCertificate(emailAddress, account, transactionId);
-                    var certString = cert.RetrieveCertificateResponse.Certificate;
-                    actualCert = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-                }
-            }
-
-            return actualCert;
-        }
+       
     }
 }

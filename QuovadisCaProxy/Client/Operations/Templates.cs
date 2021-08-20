@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
-namespace QuovadisAPITester.Operations
+namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
 {
     public class Templates
     {
@@ -22,11 +22,11 @@ namespace QuovadisAPITester.Operations
             this.wsSigningCertPwd = wsSigningCertPwd;
         }
 
-        public string TestGetTemplates()
+        public GetAccountPolicyTemplateListResponse1 GetTemplates(string account)
         {
             var tr = new GetAccountPolicyTemplateListRequestType
             {
-                Account = "KeyFactor",
+                Account = account,
                 DateTime = DateTime.Now,
                 Test = false
             };
@@ -49,11 +49,7 @@ namespace QuovadisAPITester.Operations
                 await quovadisClient.GetAccountPolicyTemplateListAsync(APIVersion.v2_0, ContentEncoding.UTF8,
                     signedRequest)).Result;
 
-            
-            var writer = new StringWriter();
-            var serializer = new XmlSerializer(typeof(GetAccountPolicyTemplateListResponse1));
-            serializer.Serialize(writer, templatesResponse);
-            return writer.ToString();
+            return templatesResponse;
         }
     }
 }

@@ -6,10 +6,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using CAProxy.AnyGateway.Data;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
-using CSS.Common.Logging;
+using Common.Logging.Factory;
+using CSS.PKI;
+using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 using Org.BouncyCastle.Asn1.Pkcs;
 using ContentInfo = System.Security.Cryptography.Pkcs.ContentInfo;
 
@@ -22,7 +23,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             Type baseType = cdr.GetType();
             var field = baseType.GetField("a", BindingFlags.NonPublic | BindingFlags.Instance);
 
-            return ((CAProxy.AnyGateway.DatabaseConfigurationProvider)field.GetValue(cdr)).ConnectionString;
+            return ((CAProxy.AnyGateway.DatabaseConfigurationProvider)field?.GetValue(cdr))?.ConnectionString;
         }
 
         public static Func<string, string> Pemify = ss =>
@@ -86,8 +87,6 @@ namespace Keyfactor.AnyGateway.Quovadis
 
             using (TextReader sr = new StringReader(pemCert))
             {
-                try
-                {
                     var reader = new Org.BouncyCastle.OpenSsl.PemReader(sr);
                     var req = reader.ReadObject() as Org.BouncyCastle.Pkcs.Pkcs10CertificationRequest;
                     var csr = req?.GetCertificationRequestInfo();
@@ -130,15 +129,36 @@ namespace Keyfactor.AnyGateway.Quovadis
                     if (isRenewal)
                         finalXml = finalXml.Replace("RequestSSLCertRequest", "RenewSSLCertRequest");
                     return finalXml;
-                }
-                catch(Exception e)
-                {
-                    throw;
-                }
 
 
             }
 
+        }
+
+        public static int MapKeyfactorCertStatus(CertificateStatusType status)
+        {
+            switch (status)
+            {
+                case CertificateStatusType.Revoked:
+                    return (int) PKIConstants.Microsoft.RequestDisposition.REVOKED;
+                case CertificateStatusType.Valid:
+                    return (int)PKIConstants.Microsoft.RequestDisposition.ISSUED;
+                default:
+                    return (int)PKIConstants.Microsoft.RequestDisposition.UNKNOWN;
+            }
+        }
+
+        public static int MapKeyfactorSslStatus(StatusType status)
+        {
+            switch (status)
+            {
+                case StatusType.Revoked:
+                    return (int)PKIConstants.Microsoft.RequestDisposition.REVOKED;
+                case StatusType.Valid:
+                    return (int)PKIConstants.Microsoft.RequestDisposition.ISSUED;
+                default:
+                    return (int)PKIConstants.Microsoft.RequestDisposition.UNKNOWN;
+            }
         }
     }
 }
