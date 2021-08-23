@@ -29,7 +29,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client
 
         public async Task<KeyfactorCertificate> SubmitGetKeyfactorCertAsync(string serialNumberFilter)
         {
-            using (var resp = await RestClient.GetAsync($"/KeyfactorApi/Certificates?pq.queryString=SerialNumber%20-eq%20%22{serialNumberFilter}%22"))
+            using (var resp = await RestClient.GetAsync($"Certificates?pq.queryString=SerialNumber%20-eq%20%22{serialNumberFilter}%22"))
             {
                 resp.EnsureSuccessStatusCode();
                 var keyfactorCertificateResponse =
