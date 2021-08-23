@@ -20,6 +20,7 @@ using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResu
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
 using CSS.Common.Logging;
 using Keyfactor.AnyGateway.Quovadis.Models;
+using ResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.ResultType;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
@@ -223,7 +224,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
 
-                                    if (result.RequestSSLCertResponse.Result == QuovadisClient.ResultType.Success)
+                                    if (result.RequestSSLCertResponse.Result == ResultType.Success)
                                     {
                                         return new EnrollmentResult
                                         {
@@ -270,23 +271,44 @@ namespace Keyfactor.AnyGateway.Quovadis
                             throw;
                         }
                         break;
-                    case RequestUtilities.EnrollmentType.Renew:
-
-                       // var transactionId = certificateDataReader.GetCertificateRecord(ca;
-                        var tempRenewXml = productInfo.ProductParameters["EnrollmentTemplate"];
-                        var renewal = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                       // var renewResponse=renewal.RenewCertificate(tempRenewXml, csr, productInfo, transactionId);
-                        
-                        break;
                     case RequestUtilities.EnrollmentType.Reissue:
-                        var priorCert = certificateDataReader.GetCertificateRecord(
-                            DataConversion.HexToBytes(productInfo.ProductParameters["PriorCertSN"]));
-                        var uUId = priorCert.CARequestID; //uUId is a GUID
-                        Logger.Trace($"Reissue CA RequestId: {uUId}");
-                        Renewal ren=new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-
-
-                        break;
+                    case RequestUtilities.EnrollmentType.Renew:
+                        //One click won't work for this implementation b/c we are missing enrollment params
+                        if (productInfo.ProductParameters.ContainsKey("Enrollment Type"))
+                        {
+                            var priorCert = certificateDataReader.GetCertificateRecord(
+                                DataConversion.HexToBytes(productInfo.ProductParameters["PriorCertSN"]));
+                            var uUId = priorCert.CARequestID; //uUId is a GUID
+                            Logger.Trace($"Reissue CA RequestId: {uUId}");
+                            Renewal ren = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                            var renResult = ren.RenewCertificate(productInfo.ProductParameters["EnrollmentTemplate"],
+                                csr, productInfo, uUId);
+                            if (renResult.RenewSSLCertResponse.Result == ResultType.Success)
+                            {
+                                return new EnrollmentResult
+                                {
+                                    Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                    CARequestID = renResult.RenewSSLCertResponse.TransactionId,
+                                    StatusMessage = $"Re-Issue Succeeded with Id {renResult.RenewSSLCertResponse.Details}"
+                                };
+                            }
+                            else
+                            {
+                                return new EnrollmentResult
+                                {
+                                    Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
+                                    StatusMessage = $"Re-Issue Failed with message {renResult.RenewSSLCertResponse.Details}"
+                                };
+                            }
+                        }
+                        else
+                        {
+                            return new EnrollmentResult
+                            {
+                                Status = 30, //failure
+                                StatusMessage = "One click Renew Is Not Available for this Certificate Type.  Use the configure button instead."
+                            };
+                        }
                 }
             }
             catch (Exception e)
