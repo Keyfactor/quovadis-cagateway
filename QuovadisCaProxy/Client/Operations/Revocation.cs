@@ -27,7 +27,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
         }
 
 
-        public string RevokeCertificate(X509Certificate2 actualCert, string account, string revokeReason)
+        public RevokeCertificateBySerialNoResponse1 RevokeCertificate(X509Certificate2 actualCert, string account, string revokeReason)
         {
             var revokeRequest = new RevokeCertificateBySerialNoRequestType();
             var revokeAccount = new RevokeCertificateBySerialNoAccountInfo
@@ -61,15 +61,8 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                 await quovadisClient.RevokeCertificateBySerialNoAsync(APIVersion.v1_0, ContentEncoding.UTF8,
                     signedRequest)).Result;
 
-            var reqWriter = new StringWriter();
-            var reqSerializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoRequestType));
-            reqSerializer.Serialize(reqWriter, revokeRequest);
+            return certStatusResponse;
 
-            var resWriter = new StringWriter();
-            var serializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoResponse1));
-
-            serializer.Serialize(resWriter, certStatusResponse);
-            return "Request: " + reqWriter + " Response:" + resWriter;
         }
 
         private RevokeCerticateBySerialNoRevocationReason GetRevokeReason(string revokeReason)

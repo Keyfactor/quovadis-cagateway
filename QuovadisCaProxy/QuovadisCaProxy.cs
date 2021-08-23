@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using CAProxy.AnyGateway;
+using CAProxy.AnyGateway.Data;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
@@ -34,33 +35,10 @@ namespace Keyfactor.AnyGateway.Quovadis
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
-            /* try
-             {
-                 /var paramArray = input.Split(':')[1];
-                 var valArray = paramArray.Split(',');
-                 var transactionId = valArray[0];
-                 var emailAddress = valArray[1];
-                 var account = valArray[2];
-                 var enrollType = valArray[3];
-                 var revokeReason = valArray[4];
- 
-                 var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
-                 if (actualCert != null)
-                 {
-                     var revoke = new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                     //perform the revoke
-                     Console.Write(revoke.RevokeCertificate(actualCert, account, revokeReason));
-                 }
-             }
-             catch (Exception e)
-             {
-                 throw new Exception($"Revoke failed with message {e.Message}");
-             }
-             
-             throw new Exception("Revoke failed");
-             */
-
-            return 0;
+            Revocation revoke = new Revocation(BaseUrl,WebServiceSigningCertDir,WebServiceSigningCertPassword);
+            var revokeResponse = revoke.RevokeCertificate();
+            CertificateDataReader certificateDataReader = new CertificateDataReader(;
+            certificateDataReader.GetCertificateRecord();
         }
 
         [Obsolete]
