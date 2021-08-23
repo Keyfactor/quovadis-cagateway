@@ -8,6 +8,7 @@ using CAProxy.AnyGateway;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
+using CSS.Common;
 using CSS.PKI;
 using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
@@ -274,7 +275,10 @@ namespace Keyfactor.AnyGateway.Quovadis
                         */
                         break;
                     case RequestUtilities.EnrollmentType.Reissue:
-
+                        var priorCert = certificateDataReader.GetCertificateRecord(
+                            DataConversion.HexToBytes(productInfo.ProductParameters["PriorCertSN"]));
+                        var uUId = priorCert.CARequestID.Substring(0, 36); //uUId is a GUID
+                        Logger.Trace($"Reissue uUId: {uUId}");
                         break;
                 }
             }
