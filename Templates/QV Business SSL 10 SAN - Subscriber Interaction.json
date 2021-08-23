@@ -39,14 +39,6 @@
         ""
       ],
       "DataType": 1
-    },
-	{
-      "Id": 2228544,
-      "Name": "Organisation Name",
-      "Options": [
-        ""
-      ],
-      "DataType": 1
     }
   ],
   "AllowedEnrollmentTypes": 7,

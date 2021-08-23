@@ -89,11 +89,9 @@ namespace Keyfactor.AnyGateway.Quovadis
                         Logger.Error("Synchronize was canceled.");
                         break;
                     }
-
                     try
                     {
                         Logger.Trace($"Took Certificate ID {currentResponseItem?.Id} from Queue");
-
 
                         if (currentResponseItem?.RequestType == "SSLRequest")
                         {
@@ -115,18 +113,21 @@ namespace Keyfactor.AnyGateway.Quovadis
                                 var cert = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
                                     currentResponseItem.Account, currentResponseItem.CaRequestId);
                                 var certString = cert.RetrieveSSLCertResponse.Certificate;
-                                var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-
-                                blockingBuffer.Add(new CAConnectorCertificate
+                                //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
+                                if (cert.RetrieveSSLCertResponse.ErrorCode != "110")
                                 {
-                                    CARequestID = $"{currentResponseItem.CaRequestId}",
-                                    Certificate = certString,
-                                    SubmissionDate = currentResponseItem.SubmissionDate,
-                                    Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
-                                        .Status),
-                                    ProductID = currentResponseItem.TemplateName
-                                }, cancelToken);
+                                    var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
 
+                                    blockingBuffer.Add(new CAConnectorCertificate
+                                    {
+                                        CARequestID = $"{currentResponseItem.CaRequestId}",
+                                        Certificate = certString,
+                                        SubmissionDate = currentResponseItem.SubmissionDate,
+                                        Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
+                                            .Status),
+                                        ProductID = currentResponseItem.TemplateName
+                                    }, cancelToken);
+                                }
                             }
                         }
                         else
@@ -148,17 +149,21 @@ namespace Keyfactor.AnyGateway.Quovadis
                                 var cert = certResult.RequestCertificate(currentResponseItem?.SubscriberEmail,
                                     currentResponseItem?.Account, currentResponseItem?.CaRequestId);
                                 var certString = cert.RetrieveCertificateResponse.Certificate;
-                                var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-
-                                blockingBuffer.Add(new CAConnectorCertificate
+                                //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
+                                if (cert.RetrieveCertificateResponse.ErrorCode != "110")
                                 {
-                                    CARequestID = $"{currentResponseItem?.CaRequestId}",
-                                    Certificate = certString,
-                                    SubmissionDate = currentResponseItem?.SubmissionDate,
-                                    Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
-                                        .Status),
-                                    ProductID = currentResponseItem?.TemplateName
-                                }, cancelToken);
+                                    var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+
+                                    blockingBuffer.Add(new CAConnectorCertificate
+                                    {
+                                        CARequestID = $"{currentResponseItem?.CaRequestId}",
+                                        Certificate = certString,
+                                        SubmissionDate = currentResponseItem.SubmissionDate,
+                                        Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
+                                            .Status),
+                                        ProductID = currentResponseItem?.TemplateName
+                                    }, cancelToken);
+                                }
                             }
                         }
                     }
@@ -196,7 +201,6 @@ namespace Keyfactor.AnyGateway.Quovadis
         {
             try
             {
-
                 switch (enrollmentType)
                 {
                     case RequestUtilities.EnrollmentType.New:
@@ -266,13 +270,12 @@ namespace Keyfactor.AnyGateway.Quovadis
                         }
                         break;
                     case RequestUtilities.EnrollmentType.Renew:
-                        /*
-                        var transactionId = certificateDataReader.GetCertificateRecord();
 
+                       // var transactionId = certificateDataReader.GetCertificateRecord(ca;
                         var tempRenewXml = productInfo.ProductParameters["EnrollmentTemplate"];
                         var renewal = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                        var renewResponse=renewal.RenewCertificate(tempRenewXml, csr, productInfo, transactionId);
-                        */
+                       // var renewResponse=renewal.RenewCertificate(tempRenewXml, csr, productInfo, transactionId);
+                        
                         break;
                     case RequestUtilities.EnrollmentType.Reissue:
                         var priorCert = certificateDataReader.GetCertificateRecord(

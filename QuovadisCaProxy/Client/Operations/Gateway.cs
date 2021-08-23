@@ -28,7 +28,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                 using (var connection = new SqlConnection(gatewayConnectionString))
                 {
                     using (var command = new SqlCommand(
-                        "  select Id, Status,	CARequestId, SubmissionDate, RequestCN,	RequestSubject,  (select AttributeKey,AttributeValue from RequestAttributes r where r.CertificateId = c.Id for xml path('Attribute'), type) from (select distinct Id, Status,CARequestId,SubmissionDate,RequestCN,RequestSubject from Certificates where CARequestID is not null) cFOR XML PATH ('Certificate'), root ('Certificates')",
+                        "  select Id, Status,	CARequestId, SubmissionDate, RequestCN,	RequestSubject,  (select AttributeKey,AttributeValue from RequestAttributes r where r.CertificateId = c.Id for xml path('Attribute'), type) from (select distinct Id, Status,CARequestId,SubmissionDate,RequestCN,RequestSubject from Certificates where CARequestID is not null) c FOR XML PATH ('Certificate'), root ('Certificates')",
                         connection))
                     {
                         connection.Open();
@@ -48,8 +48,9 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                                         Account = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "Organisation Name")?.AttributeValue,
                                         CaRequestId = cert.CaRequestId,
                                         RequestSubject = cert.RequestSubject,
+                                        SubmissionDate=cert.SubmissionDate,
                                         RequestCn = cert.RequestCn,
-                                        TemplateName = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "Certificate Template")?.AttributeValue
+                                        TemplateName = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CertificateTemplate")?.AttributeValue
                                     };
 
                                     if (bc.TryAdd(r, 10, ct))
