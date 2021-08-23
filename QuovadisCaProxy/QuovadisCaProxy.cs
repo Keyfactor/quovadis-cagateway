@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CAProxy.AnyGateway;
-using CAProxy.AnyGateway.Data;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
@@ -50,7 +49,6 @@ namespace Keyfactor.AnyGateway.Quovadis
 
             if (revokeResult.RevokeCertificateBySerialNoResponse.Result == RevokeCertificateBySerialNoResultType.Failure)
             {
-                throw new Exception("Revoke failed");
                 return -1;
             }
 

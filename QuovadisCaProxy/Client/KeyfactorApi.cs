@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -15,7 +13,6 @@ namespace Keyfactor.AnyGateway.Quovadis.Client
     public sealed class KeyfactorClient : LoggingClientBase
     {
         private HttpClient RestClient { get; }
-        private int PageSize { get; } = 100;
 
         public KeyfactorClient(ICAConnectorConfigProvider configProvider)
         {

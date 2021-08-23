@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
-using Common.Logging.Factory;
 using CSS.PKI;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 using Org.BouncyCastle.Asn1.Pkcs;

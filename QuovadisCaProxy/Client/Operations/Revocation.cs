@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using CSS.PKI;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
