@@ -28,6 +28,7 @@ namespace Keyfactor.AnyGateway.Quovadis
         private string WebServiceSigningCertDir { get; set; }
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
+        private string Organization { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
@@ -158,7 +159,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                                     {
                                         CARequestID = $"{currentResponseItem?.CaRequestId}",
                                         Certificate = certString,
-                                        SubmissionDate = currentResponseItem.SubmissionDate,
+                                        SubmissionDate = currentResponseItem?.SubmissionDate,
                                         Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
                                             .Status),
                                         ProductID = currentResponseItem?.TemplateName
@@ -280,8 +281,11 @@ namespace Keyfactor.AnyGateway.Quovadis
                     case RequestUtilities.EnrollmentType.Reissue:
                         var priorCert = certificateDataReader.GetCertificateRecord(
                             DataConversion.HexToBytes(productInfo.ProductParameters["PriorCertSN"]));
-                        var uUId = priorCert.CARequestID.Substring(0, 36); //uUId is a GUID
-                        Logger.Trace($"Reissue uUId: {uUId}");
+                        var uUId = priorCert.CARequestID; //uUId is a GUID
+                        Logger.Trace($"Reissue CA RequestId: {uUId}");
+                        Renewal ren=new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+
+
                         break;
                 }
             }
@@ -316,6 +320,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
             WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
+            Organization = configProvider.CAConnectionData["OrganizationId"].ToString();
         }
 
         public override void Ping()
