@@ -18,7 +18,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
     public class Gateway : LoggingClientBase
     {
         public async Task GetCertificateList(BlockingCollection<GatewayItem> bc,
-            CancellationToken ct, ICertificateDataReader certificateDataReader)
+            CancellationToken ct, ICertificateDataReader certificateDataReader,string account)
         {
             Logger.MethodEntry(ILogExtensions.MethodLogLevel.Debug);
             try
@@ -43,14 +43,16 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                                     var r = new GatewayItem
                                     {
                                         Id = cert.Id,
-                                        SubscriberEmail = cert.Attribute.FirstOrDefault(c => c.AttributeKey== "Subscriber Email")?.AttributeValue,
+                                        SubscriberEmail = cert.Attribute.FirstOrDefault(c => c.AttributeKey== "Subscriber Email")?.AttributeValue ?? cert.Attribute.FirstOrDefault(c => c.AttributeKey == "Admin Email")?.AttributeValue,
                                         RequestType = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "Enrollment Type")?.AttributeValue,
-                                        Account = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "Organisation Name")?.AttributeValue,
+                                        Account = account,
                                         CaRequestId = cert.CaRequestId,
                                         RequestSubject = cert.RequestSubject,
                                         SubmissionDate=cert.SubmissionDate,
                                         RequestCn = cert.RequestCn,
-                                        TemplateName = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CertificateTemplate")?.AttributeValue
+                                        TemplateName = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CertificateTemplate")?.AttributeValue,
+                                        CanSync= Convert.ToBoolean(cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CanSync")?.AttributeValue),
+                                        Status =cert.Status
                                     };
 
                                     if (bc.TryAdd(r, 10, ct))

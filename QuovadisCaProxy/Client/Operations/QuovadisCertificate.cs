@@ -44,7 +44,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
             var signedRequest = Utilities.BuildSignedCmsStructure(wsSigningCertDir, wsSigningCertPwd, bytes);
             switch (typeof(T).Name)
             {
-                case "RequestCertificateStatusRequest":
+                case "RequestCertificateStatusRequestType":
                     var certStatusResponse = Task.Run(async () =>
                         await quovadisClient.RequestCertificateStatusAsync(APIVersion.v1_0, ContentEncoding.UTF8,
                             signedRequest)).Result;
@@ -54,7 +54,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                         await quovadisClient.RequestSSLCertStatusAsync(APIVersion.v1_0, ContentEncoding.UTF8,
                             signedRequest)).Result;
                     return (TR)Convert.ChangeType(sslCertStatusResponse, typeof(TR));
-                case "RetrieveCertificateRequest":
+                case "RetrieveCertificateRequestType":
                     var certRetrieval = Task.Run(async () =>
                         await quovadisClient.RetrieveCertificateAsync(APIVersion.v1_0, ContentEncoding.UTF8,
                             signedRequest)).Result;
