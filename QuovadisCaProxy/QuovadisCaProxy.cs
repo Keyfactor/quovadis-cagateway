@@ -30,7 +30,6 @@ namespace Keyfactor.AnyGateway.Quovadis
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
         private string Organization { get; set; }
-        private ICAConnectorConfigProvider ConfigSettings { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
@@ -83,97 +82,101 @@ namespace Keyfactor.AnyGateway.Quovadis
             {
                 var certs = new BlockingCollection<GatewayItem>(100);
                 Gateway gw=new Gateway();
-                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader, ConfigSettings);
+                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader, Organization);
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
                 {
-                    if (cancelToken.IsCancellationRequested)
+                    //Quovadis only allows so many download attempts so if it is there don't dowload again
+                    if (currentResponseItem.Status != 20 && currentResponseItem.CanSync)
                     {
-                        Logger.Error("Synchronize was canceled.");
-                        break;
-                    }
-                    try
-                    {
-                        Logger.Trace($"Took Certificate ID {currentResponseItem?.Id} from Queue");
-
-                        if (currentResponseItem?.RequestType == "SSLRequest")
+                        if (cancelToken.IsCancellationRequested)
                         {
-                            var certStatus =
-                                new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
-                                    WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                            var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
-                                currentResponseItem.Account, currentResponseItem.CaRequestId);
-                            if (certResponse.RequestSSLCertStatusResponse.Status ==
-                                StatusType.Valid |
-                                certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked &&
-                                certResponse.RequestSSLCertStatusResponse.Result ==
-                                StatusResultType.Success)
+                            Logger.Error("Synchronize was canceled.");
+                            break;
+                        }
+                        try
+                        {
+                            Logger.Trace($"Took Certificate ID {currentResponseItem?.Id} from Queue");
+
+                            if (currentResponseItem?.RequestType == "SSLRequest")
                             {
-                                var certResult =
-                                    new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(
+                                var certStatus =
+                                    new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
+                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                    currentResponseItem.Account, currentResponseItem.CaRequestId);
+                                if (certResponse.RequestSSLCertStatusResponse.Status ==
+                                    StatusType.Valid |
+                                    certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked &&
+                                    certResponse.RequestSSLCertStatusResponse.Result ==
+                                    StatusResultType.Success)
+                                {
+                                    var certResult =
+                                        new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(
+                                            BaseUrl,
+                                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                    var cert = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                        currentResponseItem.Account, currentResponseItem.CaRequestId);
+                                    var certString = cert.RetrieveSSLCertResponse.Certificate;
+                                    //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
+                                    if (cert.RetrieveSSLCertResponse.ErrorCode != "110")
+                                    {
+                                        var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+
+                                        blockingBuffer.Add(new CAConnectorCertificate
+                                        {
+                                            CARequestID = $"{currentResponseItem.CaRequestId}",
+                                            Certificate = certString,
+                                            SubmissionDate = currentResponseItem.SubmissionDate,
+                                            Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
+                                                .Status),
+                                            ProductID = currentResponseItem.TemplateName
+                                        }, cancelToken);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var certStatus =
+                                    new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
                                         BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                                var cert = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
-                                    currentResponseItem.Account, currentResponseItem.CaRequestId);
-                                var certString = cert.RetrieveSSLCertResponse.Certificate;
-                                //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
-                                if (cert.RetrieveSSLCertResponse.ErrorCode != "110")
-                                {
-                                    var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-
-                                    blockingBuffer.Add(new CAConnectorCertificate
-                                    {
-                                        CARequestID = $"{currentResponseItem.CaRequestId}",
-                                        Certificate = certString,
-                                        SubmissionDate = currentResponseItem.SubmissionDate,
-                                        Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
-                                            .Status),
-                                        ProductID = currentResponseItem.TemplateName
-                                    }, cancelToken);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var certStatus =
-                                new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
-                                    BaseUrl,
-                                    WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                            var certResponse = certStatus.RequestCertificate(currentResponseItem?.SubscriberEmail,
-                                currentResponseItem?.Account, currentResponseItem?.CaRequestId);
-                            if (certResponse.RequestCertificateStatusResponse.Status ==
-                                CertificateStatusType.Valid &&
-                                certResponse.RequestCertificateStatusResponse.Result ==
-                                CertificateStatusResultType.Success)
-                            {
-                                var certResult =
-                                    new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
-                                        WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                                var cert = certResult.RequestCertificate(currentResponseItem?.SubscriberEmail,
+                                var certResponse = certStatus.RequestCertificate(currentResponseItem?.SubscriberEmail,
                                     currentResponseItem?.Account, currentResponseItem?.CaRequestId);
-                                var certString = cert.RetrieveCertificateResponse.Certificate;
-                                //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
-                                if (cert.RetrieveCertificateResponse.ErrorCode != "110")
+                                if (certResponse.RequestCertificateStatusResponse.Status ==
+                                    CertificateStatusType.Valid &&
+                                    certResponse.RequestCertificateStatusResponse.Result ==
+                                    CertificateStatusResultType.Success)
                                 {
-                                    var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
-
-                                    blockingBuffer.Add(new CAConnectorCertificate
+                                    var certResult =
+                                        new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
+                                            WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                                    var cert = certResult.RequestCertificate(currentResponseItem?.SubscriberEmail,
+                                        currentResponseItem?.Account, currentResponseItem?.CaRequestId);
+                                    var certString = cert.RetrieveCertificateResponse.Certificate;
+                                    //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
+                                    if (cert.RetrieveCertificateResponse.ErrorCode != "110")
                                     {
-                                        CARequestID = $"{currentResponseItem?.CaRequestId}",
-                                        Certificate = certString,
-                                        SubmissionDate = currentResponseItem?.SubmissionDate,
-                                        Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
-                                            .Status),
-                                        ProductID = currentResponseItem?.TemplateName
-                                    }, cancelToken);
+                                        var _ = new X509Certificate2(Encoding.ASCII.GetBytes(certString));
+
+                                        blockingBuffer.Add(new CAConnectorCertificate
+                                        {
+                                            CARequestID = $"{currentResponseItem?.CaRequestId}",
+                                            Certificate = certString,
+                                            SubmissionDate = currentResponseItem?.SubmissionDate,
+                                            Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
+                                                .Status),
+                                            ProductID = currentResponseItem?.TemplateName
+                                        }, cancelToken);
+                                    }
                                 }
                             }
                         }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Logger.Error("Synchronize was canceled.");
-                        break;
+                        catch (OperationCanceledException)
+                        {
+                            Logger.Error("Synchronize was canceled.");
+                            break;
+                        }
                     }
                 }
             }
@@ -344,7 +347,6 @@ namespace Keyfactor.AnyGateway.Quovadis
             WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
             Organization = configProvider.CAConnectionData["OrganizationId"].ToString();
-            ConfigSettings = configProvider;
         }
 
         public override void Ping()
