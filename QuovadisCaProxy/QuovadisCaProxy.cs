@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using CAProxy.AnyGateway;
 using CAProxy.AnyGateway.Data;
 using CAProxy.AnyGateway.Interfaces;
@@ -12,6 +13,7 @@ using CAProxy.Common;
 using CSS.Common;
 using CSS.Common.Logging;
 using CSS.PKI;
+using Keyfactor.AnyGateway.Quovadis.Client;
 using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.Models;
@@ -20,6 +22,7 @@ using CertificateStatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient
 using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType;
 using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
 using ResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.ResultType;
+using RevokeCertificateBySerialNoResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.RevokeCertificateBySerialNoResultType;
 using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
 
@@ -35,10 +38,24 @@ namespace Keyfactor.AnyGateway.Quovadis
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
+            KeyfactorClient kfClient=new KeyfactorClient(ConfigSettings);
+            var keyfactorCert =
+                Task.Run(async () =>
+                        await kfClient.SubmitGetKeyfactorCertAsync(hexSerialNumber))
+                    .Result;
+
             Revocation revoke = new Revocation(BaseUrl,WebServiceSigningCertDir,WebServiceSigningCertPassword);
-            var revokeResponse = revoke.RevokeCertificate();
-            CertificateDataReader certificateDataReader = new CertificateDataReader(;
-            certificateDataReader.GetCertificateRecord();
+            var revokeResult =
+                revoke.RevokeCertificate(hexSerialNumber, keyfactorCert.IssuerDn, Organization, Convert.ToInt16(revocationReason));
+
+            if (revokeResult.RevokeCertificateBySerialNoResponse.Result == RevokeCertificateBySerialNoResultType.Failure)
+            {
+                throw new Exception("Revoke failed");
+                return -1;
+            }
+
+            return Convert.ToInt32(PKIConstants.Microsoft.RequestDisposition.REVOKED);
+
         }
 
         [Obsolete]

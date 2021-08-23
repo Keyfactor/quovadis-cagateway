@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client\KeyfactorApi.cs" />
     <Compile Include="Client\Operations\Gateway.cs" />
     <Compile Include="Client\Operations\Enrollment.cs" />
     <Compile Include="Client\Operations\QuovadisCertificate.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\GatewayItem.cs" />
     <Compile Include="Interfaces\IGatewayItem.cs" />
+    <Compile Include="Models\KeyfactorCertificate.cs" />
     <Compile Include="QuovadisCaProxy.cs" />
     <Compile Include="Exceptions\RetryCountExceededException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

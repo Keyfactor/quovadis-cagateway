@@ -8,6 +8,7 @@ using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using CSS.PKI;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 
@@ -27,7 +28,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
         }
 
 
-        public RevokeCertificateBySerialNoResponse1 RevokeCertificate(X509Certificate2 actualCert, string account, string revokeReason)
+        public RevokeCertificateBySerialNoResponse1 RevokeCertificate(string serialNumber, string issuerDn, string account, int revokeReason)
         {
             var revokeRequest = new RevokeCertificateBySerialNoRequestType();
             var revokeAccount = new RevokeCertificateBySerialNoAccountInfo
@@ -39,9 +40,9 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
             revokeRequest.DateTime = DateTime.Now;
             revokeRequest.Reason = GetRevokeReason(revokeReason);
             revokeRequest.SerialNo =
-                Utilities.AddSerialNumberDashes(actualCert.SerialNumber, '-', 2).TrimEnd('-').ToLower();
+                Utilities.AddSerialNumberDashes(serialNumber, '-', 2).TrimEnd('-').ToLower();
             revokeRequest.IssuerDN =
-                string.Join(",", actualCert.Issuer.Split(',').Reverse()).Trim().Replace(",C=", ", C=");
+                string.Join(",", issuerDn.Split(',').Reverse()).Trim().Replace(",C=", ", C=");
 
             var x = new XmlSerializer(revokeRequest.GetType());
             byte[] bytes;
@@ -65,15 +66,15 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
 
         }
 
-        private RevokeCerticateBySerialNoRevocationReason GetRevokeReason(string revokeReason)
+        private RevokeCerticateBySerialNoRevocationReason GetRevokeReason(int revokeReason)
         {
             switch (revokeReason)
             {
-                case "Key Compromise":
+                case 1:
                     return RevokeCerticateBySerialNoRevocationReason.keyCompromise;
-                case "Affiliation Changed":
+                case 3:
                     return RevokeCerticateBySerialNoRevocationReason.affiliationChanged;
-                case "Superseded":
+                case 4:
                     return RevokeCerticateBySerialNoRevocationReason.superseded;
                 default:
                     return RevokeCerticateBySerialNoRevocationReason.cessationOfOperation;
