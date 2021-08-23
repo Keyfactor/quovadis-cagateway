@@ -10,7 +10,6 @@ using System.Xml.Serialization;
 using CAProxy.AnyGateway.Interfaces;
 using CSS.Common.Logging;
 using Keyfactor.AnyGateway.Quovadis.Exceptions;
-using Keyfactor.AnyGateway.Quovadis.Interfaces;
 using Keyfactor.AnyGateway.Quovadis.Models;
 
 namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
@@ -18,12 +17,14 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
     public class Gateway : LoggingClientBase
     {
         public async Task GetCertificateList(BlockingCollection<GatewayItem> bc,
-            CancellationToken ct, ICertificateDataReader certificateDataReader,string account)
+            CancellationToken ct, ICertificateDataReader certificateDataReader,string account, ICAConnectorConfigProvider configSettings)
         {
             Logger.MethodEntry(ILogExtensions.MethodLogLevel.Debug);
             try
             {
                 var gatewayConnectionString = Utilities.GetGatewayConnection(certificateDataReader);
+                
+
 
                 using (var connection = new SqlConnection(gatewayConnectionString))
                 {
@@ -40,6 +41,8 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                             if (certList.Count>0)
                                 foreach (var cert in certList)
                                 {
+                                    var templateName = cert.Attribute
+                                        .FirstOrDefault(c => c.AttributeKey == "CertificateTemplate")?.AttributeValue;
                                     var r = new GatewayItem
                                     {
                                         Id = cert.Id,
@@ -50,8 +53,8 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                                         RequestSubject = cert.RequestSubject,
                                         SubmissionDate=cert.SubmissionDate,
                                         RequestCn = cert.RequestCn,
-                                        TemplateName = cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CertificateTemplate")?.AttributeValue,
-                                        CanSync= Convert.ToBoolean(cert.Attribute.FirstOrDefault(c => c.AttributeKey == "CanSync")?.AttributeValue),
+                                        TemplateName = templateName,
+                                        Sync= configSettings.CAConnectionData[templateName ?? string.Empty].ToString(),
                                         Status =cert.Status
                                     };
 

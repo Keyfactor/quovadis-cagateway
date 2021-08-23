@@ -15,7 +15,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Models
         public string SubscriberEmail { get; set; }
         public string Account { get; set; }
         public string TemplateName { get; set; }
-        public bool CanSync { get; set;}
+        public string Sync { get; set;}
 
 
     }

@@ -9,18 +9,18 @@ using CAProxy.AnyGateway.Interfaces;
 using CAProxy.AnyGateway.Models;
 using CAProxy.Common;
 using CSS.Common;
+using CSS.Common.Logging;
 using CSS.PKI;
 using Keyfactor.AnyGateway.Quovadis.Client.Operations;
 using Keyfactor.AnyGateway.Quovadis.Client.XSDs;
+using Keyfactor.AnyGateway.Quovadis.Models;
 using Keyfactor.AnyGateway.Quovadis.QuovadisClient;
 using CertificateStatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusResultType;
 using CertificateStatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.CertificateStatusType;
 using InviteResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.InviteResultType;
+using ResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.ResultType;
 using StatusResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusResultType;
 using StatusType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.StatusType;
-using CSS.Common.Logging;
-using Keyfactor.AnyGateway.Quovadis.Models;
-using ResultType = Keyfactor.AnyGateway.Quovadis.QuovadisClient.ResultType;
 
 namespace Keyfactor.AnyGateway.Quovadis
 {
@@ -30,36 +30,37 @@ namespace Keyfactor.AnyGateway.Quovadis
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
         private string Organization { get; set; }
+        private ICAConnectorConfigProvider ConfigSettings { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
-           /* try
-            {
-                /var paramArray = input.Split(':')[1];
-                var valArray = paramArray.Split(',');
-                var transactionId = valArray[0];
-                var emailAddress = valArray[1];
-                var account = valArray[2];
-                var enrollType = valArray[3];
-                var revokeReason = valArray[4];
+            /* try
+             {
+                 /var paramArray = input.Split(':')[1];
+                 var valArray = paramArray.Split(',');
+                 var transactionId = valArray[0];
+                 var emailAddress = valArray[1];
+                 var account = valArray[2];
+                 var enrollType = valArray[3];
+                 var revokeReason = valArray[4];
+ 
+                 var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
+                 if (actualCert != null)
+                 {
+                     var revoke = new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                     //perform the revoke
+                     Console.Write(revoke.RevokeCertificate(actualCert, account, revokeReason));
+                 }
+             }
+             catch (Exception e)
+             {
+                 throw new Exception($"Revoke failed with message {e.Message}");
+             }
+             
+             throw new Exception("Revoke failed");
+             */
 
-                var actualCert = GetX509Certificate(enrollType, emailAddress, account, transactionId);
-                if (actualCert != null)
-                {
-                    var revoke = new Revocation(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                    //perform the revoke
-                    Console.Write(revoke.RevokeCertificate(actualCert, account, revokeReason));
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Revoke failed with message {e.Message}");
-            }
-            
-            throw new Exception("Revoke failed");
-            */
-
-           return 0;
+            return 0;
         }
 
         [Obsolete]
@@ -75,39 +76,40 @@ namespace Keyfactor.AnyGateway.Quovadis
             CertificateAuthoritySyncInfo certificateAuthoritySyncInfo,
             CancellationToken cancelToken)
         {
-            Logger.Debug($"Entering Synchronization process");
+            Logger.Debug("Entering Synchronization process");
             Logger.Trace($"Full Sync? {certificateAuthoritySyncInfo.DoFullSync}");
 
             try
             {
                 var certs = new BlockingCollection<GatewayItem>(100);
-                Gateway gw=new Gateway();
-                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader, Organization);
+                var gw = new Gateway();
+                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader, Organization, ConfigSettings);
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
-                {
-                    //Quovadis only allows so many download attempts so if it is there don't dowload again
-                    if (currentResponseItem.Status != 20 && currentResponseItem.CanSync)
+                    //Quovadis only allows so many download attempts so if it is there don't download again
+                    if (currentResponseItem.Status != 20 && currentResponseItem.Sync == "Sync")
                     {
                         if (cancelToken.IsCancellationRequested)
                         {
                             Logger.Error("Synchronize was canceled.");
                             break;
                         }
+
                         try
                         {
-                            Logger.Trace($"Took Certificate ID {currentResponseItem?.Id} from Queue");
+                            Logger.Trace($"Took Certificate ID {currentResponseItem.Id} from Queue");
 
-                            if (currentResponseItem?.RequestType == "SSLRequest")
+                            if (currentResponseItem.RequestType == "SSLRequest")
                             {
                                 var certStatus =
-                                    new QuovadisCertificate<RequestSSLCertStatusRequestType, RequestSSLCertStatusResponse1>(BaseUrl,
+                                    new QuovadisCertificate<RequestSSLCertStatusRequestType,
+                                        RequestSSLCertStatusResponse1>(BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                 var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
                                     currentResponseItem.Account, currentResponseItem.CaRequestId);
-                                if (certResponse.RequestSSLCertStatusResponse.Status ==
-                                    StatusType.Valid |
-                                    certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked &&
+                                if ((certResponse.RequestSSLCertStatusResponse.Status ==
+                                     StatusType.Valid) |
+                                    (certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked) &&
                                     certResponse.RequestSSLCertStatusResponse.Result ==
                                     StatusResultType.Success)
                                 {
@@ -128,7 +130,8 @@ namespace Keyfactor.AnyGateway.Quovadis
                                             CARequestID = $"{currentResponseItem.CaRequestId}",
                                             Certificate = certString,
                                             SubmissionDate = currentResponseItem.SubmissionDate,
-                                            Status = Utilities.MapKeyfactorSslStatus(certResponse.RequestSSLCertStatusResponse
+                                            Status = Utilities.MapKeyfactorSslStatus(certResponse
+                                                .RequestSSLCertStatusResponse
                                                 .Status),
                                             ProductID = currentResponseItem.TemplateName
                                         }, cancelToken);
@@ -138,21 +141,23 @@ namespace Keyfactor.AnyGateway.Quovadis
                             else
                             {
                                 var certStatus =
-                                    new QuovadisCertificate<RequestCertificateStatusRequestType, RequestCertificateStatusResponse1>(
+                                    new QuovadisCertificate<RequestCertificateStatusRequestType,
+                                        RequestCertificateStatusResponse1>(
                                         BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                                var certResponse = certStatus.RequestCertificate(currentResponseItem?.SubscriberEmail,
-                                    currentResponseItem?.Account, currentResponseItem?.CaRequestId);
+                                var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                    currentResponseItem.Account, currentResponseItem.CaRequestId);
                                 if (certResponse.RequestCertificateStatusResponse.Status ==
                                     CertificateStatusType.Valid &&
                                     certResponse.RequestCertificateStatusResponse.Result ==
                                     CertificateStatusResultType.Success)
                                 {
                                     var certResult =
-                                        new QuovadisCertificate<RetrieveCertificateRequestType, RetrieveCertificateResponse1>(BaseUrl,
+                                        new QuovadisCertificate<RetrieveCertificateRequestType,
+                                            RetrieveCertificateResponse1>(BaseUrl,
                                             WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                                    var cert = certResult.RequestCertificate(currentResponseItem?.SubscriberEmail,
-                                        currentResponseItem?.Account, currentResponseItem?.CaRequestId);
+                                    var cert = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                        currentResponseItem.Account, currentResponseItem.CaRequestId);
                                     var certString = cert.RetrieveCertificateResponse.Certificate;
                                     //Quovadis only allows so many downloads of the cert, 110 is the error you get after you reached the max
                                     if (cert.RetrieveCertificateResponse.ErrorCode != "110")
@@ -161,12 +166,13 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                         blockingBuffer.Add(new CAConnectorCertificate
                                         {
-                                            CARequestID = $"{currentResponseItem?.CaRequestId}",
+                                            CARequestID = $"{currentResponseItem.CaRequestId}",
                                             Certificate = certString,
-                                            SubmissionDate = currentResponseItem?.SubmissionDate,
-                                            Status = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
+                                            SubmissionDate = currentResponseItem.SubmissionDate,
+                                            Status = Utilities.MapKeyfactorCertStatus(certResponse
+                                                .RequestCertificateStatusResponse
                                                 .Status),
-                                            ProductID = currentResponseItem?.TemplateName
+                                            ProductID = currentResponseItem.TemplateName
                                         }, cancelToken);
                                     }
                                 }
@@ -178,7 +184,6 @@ namespace Keyfactor.AnyGateway.Quovadis
                             break;
                         }
                     }
-                }
             }
             catch (AggregateException aggEx)
             {
@@ -189,8 +194,6 @@ namespace Keyfactor.AnyGateway.Quovadis
             }
 
             Logger.MethodExit(ILogExtensions.MethodLogLevel.Debug);
-
-
         }
 
         [Obsolete]
@@ -224,48 +227,55 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                 if (enrollType == "SSLRequest")
                                 {
-                                    var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(BaseUrl,
+                                    var enrollment = new Enrollment<RequestSSLCertRequestType, RequestSSLCertResponse1>(
+                                        BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
 
                                     if (result.RequestSSLCertResponse.Result == ResultType.Success)
-                                    {
                                         return new EnrollmentResult
                                         {
-                                            Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                            Status =
+                                                (int) PKIConstants.Microsoft.RequestDisposition
+                                                    .EXTERNAL_VALIDATION, //will never be instant has to be approved
                                             CARequestID = result.RequestSSLCertResponse.TransactionId,
-                                            StatusMessage = $"Enrollment Succeeded with Id {result.RequestSSLCertResponse.Details}",
+                                            StatusMessage =
+                                                $"Enrollment Succeeded with Id {result.RequestSSLCertResponse.Details}"
                                         };
-                                    }
                                     return new EnrollmentResult
                                     {
-                                        Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
-                                        StatusMessage = $"SSL Cert Enrollment Failed with message {result.RequestSSLCertResponse.Details}"
+                                        Status = (int) PKIConstants.Microsoft.RequestDisposition
+                                            .FAILED, //will never be instant has to be approved
+                                        StatusMessage =
+                                            $"SSL Cert Enrollment Failed with message {result.RequestSSLCertResponse.Details}"
                                     };
                                 }
 
                                 if (enrollType == "InitiateInviteRequest")
                                 {
-                                    var enrollment = new Enrollment<InitiateInviteRequestType, InitiateInviteResponse1>(BaseUrl,
+                                    var enrollment = new Enrollment<InitiateInviteRequestType, InitiateInviteResponse1>(
+                                        BaseUrl,
                                         WebServiceSigningCertDir, WebServiceSigningCertPassword);
                                     var result = enrollment.PerformEnrollment(tempXml, csr, productInfo);
 
                                     if (result.InitiateInviteResponse.Result == InviteResultType.Success)
-                                    {
                                         return new EnrollmentResult
                                         {
-                                            Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                            Status =
+                                                (int) PKIConstants.Microsoft.RequestDisposition
+                                                    .EXTERNAL_VALIDATION, //will never be instant has to be approved
                                             CARequestID = result.InitiateInviteResponse.TransactionId,
-                                            StatusMessage = $"Enrollment Succeeded with Id {result.InitiateInviteResponse.Details}"
+                                            StatusMessage =
+                                                $"Enrollment Succeeded with Id {result.InitiateInviteResponse.Details}"
                                         };
-                                    }
 
                                     return new EnrollmentResult
                                     {
-                                        Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
-                                        StatusMessage = $"Cert Enrollment Failed with message {result.InitiateInviteResponse.Details}"
+                                        Status = (int) PKIConstants.Microsoft.RequestDisposition
+                                            .FAILED, //will never be instant has to be approved
+                                        StatusMessage =
+                                            $"Cert Enrollment Failed with message {result.InitiateInviteResponse.Details}"
                                     };
-
                                 }
                             }
                         }
@@ -274,6 +284,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                             Logger.Error($"Error Occurred in New Enrollment {e.Message}");
                             throw;
                         }
+
                         break;
                     case RequestUtilities.EnrollmentType.Reissue:
                     case RequestUtilities.EnrollmentType.Renew:
@@ -284,33 +295,32 @@ namespace Keyfactor.AnyGateway.Quovadis
                                 DataConversion.HexToBytes(productInfo.ProductParameters["PriorCertSN"]));
                             var uUId = priorCert.CARequestID; //uUId is a GUID
                             Logger.Trace($"Reissue CA RequestId: {uUId}");
-                            Renewal ren = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
+                            var ren = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
                             var renResult = ren.RenewCertificate(productInfo.ProductParameters["EnrollmentTemplate"],
                                 csr, productInfo, uUId);
                             if (renResult.RenewSSLCertResponse.Result == ResultType.Success)
-                            {
                                 return new EnrollmentResult
                                 {
-                                    Status = (int)PKIConstants.Microsoft.RequestDisposition.EXTERNAL_VALIDATION, //will never be instant has to be approved
+                                    Status = (int) PKIConstants.Microsoft.RequestDisposition
+                                        .EXTERNAL_VALIDATION, //will never be instant has to be approved
                                     CARequestID = renResult.RenewSSLCertResponse.TransactionId,
-                                    StatusMessage = $"Re-Issue Succeeded with Id {renResult.RenewSSLCertResponse.Details}"
+                                    StatusMessage =
+                                        $"Re-Issue Succeeded with Id {renResult.RenewSSLCertResponse.Details}"
                                 };
-                            }
-                            else
+                            return new EnrollmentResult
                             {
-                                return new EnrollmentResult
-                                {
-                                    Status = (int)PKIConstants.Microsoft.RequestDisposition.FAILED, //will never be instant has to be approved
-                                    StatusMessage = $"Re-Issue Failed with message {renResult.RenewSSLCertResponse.Details}"
-                                };
-                            }
+                                Status = (int) PKIConstants.Microsoft.RequestDisposition
+                                    .FAILED, //will never be instant has to be approved
+                                StatusMessage = $"Re-Issue Failed with message {renResult.RenewSSLCertResponse.Details}"
+                            };
                         }
                         else
                         {
                             return new EnrollmentResult
                             {
                                 Status = 30, //failure
-                                StatusMessage = "One click Renew Is Not Available for this Certificate Type.  Use the configure button instead."
+                                StatusMessage =
+                                    "One click Renew Is Not Available for this Certificate Type.  Use the configure button instead."
                             };
                         }
                 }
@@ -327,26 +337,26 @@ namespace Keyfactor.AnyGateway.Quovadis
             return new EnrollmentResult
             {
                 Status = 30, //failure
-                StatusMessage = $"Enrollment Unknown Failure"
+                StatusMessage = "Enrollment Unknown Failure"
             };
         }
 
 
-        
         public override CAConnectorCertificate GetSingleRecord(string caRequestId)
         {
-            return new CAConnectorCertificate() 
-            { 
-                CARequestID=caRequestId
+            return new CAConnectorCertificate
+            {
+                CARequestID = caRequestId
             };
         }
 
         public override void Initialize(ICAConnectorConfigProvider configProvider)
         {
             BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
-            WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
+            WebServiceSigningCertDir = configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
             Organization = configProvider.CAConnectionData["OrganizationId"].ToString();
+            ConfigSettings = configProvider;
         }
 
         public override void Ping()
@@ -361,7 +371,5 @@ namespace Keyfactor.AnyGateway.Quovadis
             Dictionary<string, object> connectionInfo)
         {
         }
-
-       
     }
 }
