@@ -30,6 +30,7 @@ namespace Keyfactor.AnyGateway.Quovadis
         private string BaseUrl { get; set; }
         private string WebServiceSigningCertPassword { get; set; }
         private string Organization { get; set; }
+        private ICAConnectorConfigProvider ConfigSettings { get; set; }
 
         public override int Revoke(string caRequestId, string hexSerialNumber, uint revocationReason)
         {
@@ -82,7 +83,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             {
                 var certs = new BlockingCollection<GatewayItem>(100);
                 Gateway gw=new Gateway();
-                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader);
+                _ = gw.GetCertificateList(certs, cancelToken, certificateDataReader, ConfigSettings);
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
                 {
@@ -343,6 +344,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             WebServiceSigningCertDir= configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
             WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
             Organization = configProvider.CAConnectionData["OrganizationId"].ToString();
+            ConfigSettings = configProvider;
         }
 
         public override void Ping()
