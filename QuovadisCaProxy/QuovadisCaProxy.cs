@@ -45,7 +45,7 @@ namespace Keyfactor.AnyGateway.Quovadis
 
             Revocation revoke = new Revocation(BaseUrl,WebServiceSigningCertDir,WebServiceSigningCertPassword);
             var revokeResult =
-                revoke.RevokeCertificate(hexSerialNumber, keyfactorCert.IssuerDn, Organization, Convert.ToInt16(revocationReason));
+                revoke.RevokeCertificate(hexSerialNumber, keyfactorCert[0].IssuerDn, Organization, Convert.ToInt16(revocationReason));
 
             if (revokeResult.RevokeCertificateBySerialNoResponse.Result == RevokeCertificateBySerialNoResultType.Failure)
             {

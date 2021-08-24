@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -27,13 +28,13 @@ namespace Keyfactor.AnyGateway.Quovadis.Client
             RestClient.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(plainTextBytes));
         }
 
-        public async Task<KeyfactorCertificate> SubmitGetKeyfactorCertAsync(string serialNumberFilter)
+        public async Task<List<KeyfactorCertificate>> SubmitGetKeyfactorCertAsync(string serialNumberFilter)
         {
             using (var resp = await RestClient.GetAsync($"Certificates?pq.queryString=SerialNumber%20-eq%20%22{serialNumberFilter}%22"))
             {
                 resp.EnsureSuccessStatusCode();
                 var keyfactorCertificateResponse =
-                    JsonConvert.DeserializeObject<KeyfactorCertificate>(await resp.Content.ReadAsStringAsync());
+                    JsonConvert.DeserializeObject<List<KeyfactorCertificate>>(await resp.Content.ReadAsStringAsync());
                 return keyfactorCertificateResponse;
             }
         }
