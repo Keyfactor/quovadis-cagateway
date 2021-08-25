@@ -93,7 +93,6 @@
     <Compile Include="Client\Operations\QuovadisCertificate.cs" />
     <Compile Include="Client\Operations\Renewal.cs" />
     <Compile Include="Client\Operations\Revocation.cs" />
-    <Compile Include="Client\Operations\Templates.cs" />
     <Compile Include="Client\QuovadisClient.cs" />
     <Compile Include="Client\XSDs\AddSubscriberRequest.cs">
       <DependentUpon>AddSubscriberRequest.xsd</DependentUpon>
@@ -244,7 +243,6 @@
       <SubType>code</SubType>
       <DependentUpon>RevokeSSLCertResponse.xsd</DependentUpon>
     </Compile>
-    <Compile Include="Constants.cs" />
     <Compile Include="Models\Attribute.cs" />
     <Compile Include="Models\Certificate.cs" />
     <Compile Include="Models\GatewayItem.cs" />
@@ -253,7 +251,6 @@
     <Compile Include="QuovadisCaProxy.cs" />
     <Compile Include="Exceptions\RetryCountExceededException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestManager.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>

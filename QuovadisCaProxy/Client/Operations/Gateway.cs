@@ -11,6 +11,7 @@ using CAProxy.AnyGateway.Interfaces;
 using CSS.Common.Logging;
 using Keyfactor.AnyGateway.Quovadis.Exceptions;
 using Keyfactor.AnyGateway.Quovadis.Models;
+using Newtonsoft.Json;
 
 namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
 {
@@ -37,6 +38,8 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                         {
                             XmlSerializer serializer = new XmlSerializer(typeof(List<Certificate>), new XmlRootAttribute("Certificates"));
                             List<Certificate> certList = (List<Certificate>)serializer.Deserialize(resp);
+
+                            Logger.Trace($"Keyfactor Cert List {JsonConvert.SerializeObject(certList)}");
                           
                             if (certList.Count>0)
                                 foreach (var cert in certList)
