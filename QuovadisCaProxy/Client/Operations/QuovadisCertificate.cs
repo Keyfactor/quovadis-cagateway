@@ -53,7 +53,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                 Logger.Trace($"RequestCertificate Type={typeof(T).Name}");
 
                 var resWriter = new StringWriter();
-                var resSerializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoResponse1));
+                var resSerializer = new XmlSerializer(typeof(TR));
 
                 switch (typeof(T).Name)
                 {
