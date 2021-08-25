@@ -107,7 +107,11 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
                     //Quovadis only allows so many download attempts so if it is there don't download again
-                    if (currentResponseItem.Status != 20 && currentResponseItem.Sync == "Sync")
+                    if ((currentResponseItem.Status !=
+                         Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.ISSUED)) |
+                        (currentResponseItem.Status !=
+                         Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.REVOKED)) &&
+                        currentResponseItem.Sync == "Sync")
                     {
                         if (cancelToken.IsCancellationRequested)
                         {
@@ -210,7 +214,8 @@ namespace Keyfactor.AnyGateway.Quovadis
                                         new QuovadisCertificate<RetrieveCertificateRequestType,
                                             RetrieveCertificateResponse1>(BaseUrl,
                                             WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                                    var nonSslCertResponse = certResult.RequestCertificate(currentResponseItem.SubscriberEmail,
+                                    var nonSslCertResponse = certResult.RequestCertificate(
+                                        currentResponseItem.SubscriberEmail,
                                         currentResponseItem.Account, currentResponseItem.CaRequestId);
 
                                     var resWriter = new StringWriter();
@@ -228,10 +233,12 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                     Logger.Trace(
                                         $"Valid Cert with Subject = {actualCertificate2.Subject}");
-                                    
+
                                     var curReqId = currentResponseItem.CaRequestId;
                                     var curSubmissionDate = currentResponseItem.SubmissionDate;
-                                    var curStatus = Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse.Status);
+                                    var curStatus =
+                                        Utilities.MapKeyfactorCertStatus(certResponse.RequestCertificateStatusResponse
+                                            .Status);
                                     var curTemplateId = currentResponseItem.TemplateName;
 
                                     Logger.Trace(
@@ -371,11 +378,11 @@ namespace Keyfactor.AnyGateway.Quovadis
                                 DataConversion.HexToBytes(sn));
 
                             var uUId = priorCert.CARequestID; //uUId is a GUID
-                            
+
                             Logger.Trace($"Reissue CA RequestId: {uUId}");
-                            
+
                             var ren = new Renewal(BaseUrl, WebServiceSigningCertDir, WebServiceSigningCertPassword);
-                            
+
                             var renResult = ren.RenewCertificate(productInfo.ProductParameters["EnrollmentTemplate"],
                                 csr, productInfo, uUId);
 
@@ -451,10 +458,12 @@ namespace Keyfactor.AnyGateway.Quovadis
                 Logger.MethodEntry(ILogExtensions.MethodLogLevel.Debug);
                 BaseUrl = configProvider.CAConnectionData["BaseUrl"].ToString();
                 WebServiceSigningCertDir = configProvider.CAConnectionData["WebServiceSigningCertDir"].ToString();
-                WebServiceSigningCertPassword = configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
+                WebServiceSigningCertPassword =
+                    configProvider.CAConnectionData["WebServiceSigningCertPassword"].ToString();
                 Organization = configProvider.CAConnectionData["OrganizationId"].ToString();
                 ConfigSettings = configProvider;
-                Logger.Trace($"BaseUrl={BaseUrl}, Web Service Signing Dir={WebServiceSigningCertDir}, WS Sign Pwd={WebServiceSigningCertPassword}, Organization={Organization}");
+                Logger.Trace(
+                    $"BaseUrl={BaseUrl}, Web Service Signing Dir={WebServiceSigningCertDir}, WS Sign Pwd={WebServiceSigningCertPassword}, Organization={Organization}");
                 Logger.MethodExit(ILogExtensions.MethodLogLevel.Debug);
             }
             catch (Exception e)
