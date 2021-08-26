@@ -66,7 +66,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                     RevokeCertificateBySerialNoResultType.Failure)
                 {
                     Logger.Trace("Returning Error");
-                    return -1;
+                    throw new Exception("Error Revoking Certificate");
                 }
 
                 Logger.MethodExit(ILogExtensions.MethodLogLevel.Debug);
@@ -77,7 +77,7 @@ namespace Keyfactor.AnyGateway.Quovadis
             catch (Exception e)
             {
                 Logger.Trace($"Unexpected Error Occurred in Revoke {e.Message}");
-                throw;
+                return 20;
             }
         }
 
@@ -107,11 +107,7 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                 foreach (var currentResponseItem in certs.GetConsumingEnumerable(cancelToken))
                     //Quovadis only allows so many download attempts so if it is there don't download again
-                    if ((currentResponseItem.Status !=
-                         Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.ISSUED)) |
-                        (currentResponseItem.Status !=
-                         Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.REVOKED)) &&
-                        currentResponseItem.Sync == "Sync")
+                    if (currentResponseItem.Status != Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.ISSUED) && currentResponseItem.Status != Convert.ToInt16(PKIConstants.Microsoft.RequestDisposition.REVOKED) && currentResponseItem.Sync == "Sync")
                     {
                         if (cancelToken.IsCancellationRequested)
                         {
@@ -143,11 +139,7 @@ namespace Keyfactor.AnyGateway.Quovadis
                                 resSerializer.Serialize(resWriter, certResponse);
                                 Logger.Trace("Quovadis SSL Status API Response: " + resWriter);
 
-                                if ((certResponse.RequestSSLCertStatusResponse.Status ==
-                                     StatusType.Valid) |
-                                    (certResponse.RequestSSLCertStatusResponse.Status == StatusType.Revoked) &&
-                                    certResponse.RequestSSLCertStatusResponse.Result ==
-                                    StatusResultType.Success)
+                                if (certResponse.RequestSSLCertStatusResponse.Status == StatusType.Valid && certResponse.RequestSSLCertStatusResponse.Result == StatusResultType.Success)
                                 {
                                     var certResult =
                                         new QuovadisCertificate<RetrieveSSLCertRequestType, RetrieveSSLCertResponse1>(
@@ -205,10 +197,7 @@ namespace Keyfactor.AnyGateway.Quovadis
 
                                 var certResponse = certStatus.RequestCertificate(currentResponseItem.SubscriberEmail,
                                     currentResponseItem.Account, currentResponseItem.CaRequestId);
-                                if (certResponse.RequestCertificateStatusResponse.Status ==
-                                    CertificateStatusType.Valid &&
-                                    certResponse.RequestCertificateStatusResponse.Result ==
-                                    CertificateStatusResultType.Success)
+                                if (certResponse.RequestCertificateStatusResponse.Status == CertificateStatusType.Valid && certResponse.RequestCertificateStatusResponse.Result == CertificateStatusResultType.Success)
                                 {
                                     var certResult =
                                         new QuovadisCertificate<RetrieveCertificateRequestType,

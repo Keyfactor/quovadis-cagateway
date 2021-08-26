@@ -41,7 +41,7 @@ namespace Keyfactor.AnyGateway.Quovadis.Client.Operations
                 revokeRequest.SerialNo =
                     Utilities.AddSerialNumberDashes(serialNumber, '-', 2).TrimEnd('-').ToLower();
                 revokeRequest.IssuerDN =
-                    string.Join(",", issuerDn.Split(',').Reverse()).Trim().Replace(",C=", ", C=");
+                    string.Join(",", issuerDn.Split(',').Reverse()).Trim().Replace(",", ", ");
 
                 var reqWriter = new StringWriter();
                 var reqSerializer = new XmlSerializer(typeof(RevokeCertificateBySerialNoRequestType));
