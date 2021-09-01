@@ -1,0 +1,16 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RequestOrganisationRequestRequest" type="RequestOrganisationRequestType" />
+	<xsd:complexType name="RequestOrganisationRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/> <xsd:element name="AdministratorEmailAddress" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="Account" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="AssumedName" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="Address1" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="Address2" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="Locality" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="State" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="PostalCode" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="Country" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="MainPhone" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="DUNS" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="SupportEmail" type="xsd:string" minOccurs="1" maxOccurs="1"/> <xsd:element name="IsEV" type="xsd:boolean" minOccurs="1" maxOccurs="1"/> <xsd:element name="RegistrationNumber" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="EVCity" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="EVState" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="EVCountry" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="Agency" type="xsd:string" minOccurs="0" maxOccurs="1"/> <xsd:element name="BusinessCategory" type="BusinessCategoryType" minOccurs="0" maxOccurs="1"/> <xsd:element name="SecretQuestions" type="xsd:int" minOccurs="0" maxOccurs="1"/> <xsd:element name="RequiresCertificateAuthorisationSSL" type="xsd:boolean" minOccurs="0" maxOccurs="1"/> <xsd:element name="RequiresCertificateAuthorisationEV" type="xsd:boolean" minOccurs="0" maxOccurs="1"/> <xsd:element name="RequiresCertificateAuthorisationEU" type="xsd:boolean" minOccurs="0" maxOccurs="1"/> <xsd:element name="RequiresCertificateRevocationAuthorisation" type="xsd:boolean" minOccurs="0" maxOccurs="1"/> <xsd:element name="IsSSL" type="xsd:boolean" minOccurs="1" maxOccurs="1"/> <xsd:element name="IsEndUser" type="xsd:boolean" minOccurs="1" maxOccurs="1"/> <xsd:element name="Test" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="BusinessCategoryType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="privateOrganisation"/>
+			<xsd:enumeration value="governmentEntity"/>
+			<xsd:enumeration value="businessEntity"/>
+			<xsd:enumeration value="nonCommercialEntity"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

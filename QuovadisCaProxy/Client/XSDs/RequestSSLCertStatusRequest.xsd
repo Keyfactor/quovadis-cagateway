@@ -1,0 +1,19 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RequestSSLCertStatusRequest" type="RequestSSLCertStatusRequestType" />
+	<xsd:complexType name="RequestSSLCertStatusRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" />
+			<xsd:element name="SubscriberEmailAddress" type="xsd:string" />
+			<xsd:element name="Account" type="StatusAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TransactionId" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="StatusAccountInfo">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="OrganisationGuid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

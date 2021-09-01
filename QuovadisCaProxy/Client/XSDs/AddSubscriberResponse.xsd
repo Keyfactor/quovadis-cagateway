@@ -1,0 +1,28 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="AddSubscriberResponse" type="AddSubscriberResponseType"/>
+	<xsd:complexType name="AddSubscriberResponseType">
+		<xsd:sequence>
+			<xsd:element name="Result" type="AddResultType"/>
+			<xsd:element name="Response" type="AddResponseType"/>
+			<xsd:element name="DateTime" type="xsd:dateTime"/>
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Details" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="TransactionId" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="AddResultType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Success"/>
+			<xsd:enumeration value="Failure"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AddResponseType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Unspecified"/>
+			<xsd:enumeration value="Created"/>
+			<xsd:enumeration value="Added"/>
+			<xsd:enumeration value="Exists"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

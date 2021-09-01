@@ -1,0 +1,75 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RequestSSLCertRequest" type="RequestSSLCertRequestType" />
+	<xsd:complexType name="RequestSSLCertRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="SubscriberEmailAddress" type="xsd:string" />
+			<xsd:element name="ValidityPeriod" type="xsd:int" minOccurs="0" />
+			<xsd:element name="CertFields" type="CertFieldsType" minOccurs="0"></xsd:element>
+			<xsd:element name="CertificateType" type="xsd:int"></xsd:element>
+			<xsd:element name="CSR" type="xsd:string" />
+			<xsd:element name="Account" type="AccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ServerPlatform" type="xsd:string" />
+			<xsd:element name="CustomFields" type="KeyValuePairArray" minOccurs="0" />
+			<xsd:element name="Comments" type="xsd:string" minOccurs="0" />
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AccountInfo">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="OrganisationGuid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CertFieldsType">
+		<xsd:sequence>
+			<xsd:element name="CN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="O" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="OU" type="CustomStringArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="S" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="C" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="E" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="L" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="SAN" type="SANFieldArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="DC" type="CustomStringArray" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="MSCTI" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="MSCTN" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="MSAP" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CustomStringArray">
+		<xsd:sequence>
+			<xsd:element name="Field" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SANFieldArray">
+		<xsd:sequence>
+			<xsd:element name="Field" type="SANField" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SANField">
+		<xsd:sequence>
+			<xsd:element name="Type" type="SANFieldType" minOccurs="1"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="KeyValuePairArray">
+		<xsd:sequence>
+			<xsd:element name="Item" type="KeyValuePair" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="KeyValuePair">
+		<xsd:sequence>
+			<xsd:element name="Key" type="xsd:string" minOccurs="1"/>
+			<xsd:element name="Value" type="xsd:string" minOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="SANFieldType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DnsName"/>
+			<xsd:enumeration value="Rfc822Name"/>
+			<xsd:enumeration value="IPAddress"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

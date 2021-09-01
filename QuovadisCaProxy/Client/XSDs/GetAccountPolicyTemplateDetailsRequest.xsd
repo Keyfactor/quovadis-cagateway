@@ -1,0 +1,11 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="GetAccountPolicyTemplateDetailsRequest" type="GetAccountPolicyTemplateDetailsRequestType" />
+	<xsd:complexType name="GetAccountPolicyTemplateDetailsRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Account" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="PTID" type="xsd:int" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

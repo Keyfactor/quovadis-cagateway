@@ -1,0 +1,11 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RequestOrganisationRequestStatusRequest" type="RequestOrganisationRequestStatusRequestType" />
+	<xsd:complexType name="RequestOrganisationRequestStatusRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" />
+			<xsd:element name="Account" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TransactionId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
