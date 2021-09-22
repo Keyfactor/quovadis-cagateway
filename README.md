@@ -3,6 +3,8 @@
 
 Quovadis operates a PKI as a service platform for customers around the globe.  The AnyGateway solution for Quovadis is designed to allow Keyfactor Command the ability to: - Sync certificates issued from the CA - Request new certificates from the CA - Revoke certificates directly from Keyfactor Command
 
+## Production Ready
+
 <!-- add integration specific information below -->
 *** 
 # Getting Started
@@ -26,7 +28,7 @@ There are two videos that show the configuration and functionality of the integr
 To begin, you must have the CA Gateway Service 21.3.2 installed and operational before attempting to configure the Quovadis Any Gateway plugin. This integration was tested with Keyfactor 8.7.0.0.
 To install the gateway follow these instructions.
 
-1) Gateway Server - run the installation .msi located [Here](https://github.com/Keyfactor/quovadis-cagateway/raw/main/AnyGateway-21.3.2.msi)
+1) Gateway Server - run the installation .msi obtained from Keyfactor
 
 2) Gateway Server - If you have the rights to install the database (usually in a Non SQL PAAS Environment) Using Powershell, run the following command to create the gateway database.
 
@@ -107,9 +109,9 @@ the CA.  Without the imported configuration, the service will fail to start.
    ```
    <alias alias="CAConnector" type="Keyfactor.AnyGateway.Quovadis.QuovadisCaProxy, QuovadisCaProxy"/>
    ```
-2) Gateway Server - Install the Root Quovadis Certificate that was received from Quovadis [Here](https://github.com/Keyfactor/quovadis-cagateway/raw/main/Quovadis%20Root%20Cert.cer)
+2) Gateway Server - Install the Root Quovadis Certificate that was received from Quovadis
 
-3) Gateway Server - Install the Intermediate Quovadis Certificate that was received from Quovadis [Here](https://github.com/Keyfactor/quovadis-cagateway/raw/main/Quovadis%20Intermediate.cer)
+3) Gateway Server - Install the Intermediate Quovadis Certificate that was received from Quovadis 
 
 4) Gateway Server - Take the sample Config.json located [Here](https://github.com/Keyfactor/quovadis-cagateway/raw/main/SampleConfig.json) and make the following modifications
 
