@@ -1,0 +1,377 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B823BE29-7950-49FB-9239-DDBB423B08CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Keyfactor.AnyGateway.Quovadis</RootNamespace>
+    <AssemblyName>QuovadisCaProxy</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxy.AnyGateway.Core, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxy.AnyGateway.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxy.Interfaces, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxy.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="CAProxyDAL, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CAProxyDAL.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CommonCAProxy, Version=21.3.2.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\Keyfactor.AnyGateway.SDK.21.3.2\lib\net462\CommonCAProxy.dll</HintPath>
+    </Reference>
+    <Reference Include="CSS.Common, Version=1.6.0.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\CSS.Common.1.6.0\lib\net462\CSS.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="CSS.PKI, Version=2.13.0.0, Culture=neutral, PublicKeyToken=0ed89d330114ab09, processorArchitecture=MSIL">
+      <HintPath>packages\CSS.PKI.2.13.0\lib\net462\CSS.PKI.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.CERTENROLLLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\CERTENROLLLibx64.1.0.0.1\lib\net35\Interop.CERTENROLLLib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Algorithms.4.3.1\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Pkcs, Version=5.0.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Pkcs.5.0.1\lib\net461\System.Security.Cryptography.Pkcs.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client\KeyfactorApi.cs" />
+    <Compile Include="Client\Operations\Gateway.cs" />
+    <Compile Include="Client\Operations\Enrollment.cs" />
+    <Compile Include="Client\Operations\QuovadisCertificate.cs" />
+    <Compile Include="Client\Operations\Renewal.cs" />
+    <Compile Include="Client\Operations\Revocation.cs" />
+    <Compile Include="Client\QuovadisClient.cs" />
+    <Compile Include="Client\XSDs\AddSubscriberRequest.cs">
+      <DependentUpon>AddSubscriberRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\AddSubscriberResponse.cs">
+      <DependentUpon>AddSubscriberResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountDomainListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountDomainListRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountDomainListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountDomainListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountOrganisationListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountOrganisationListRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountOrganisationListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountOrganisationListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateDetailsRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateDetailsRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateDetailsResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateDetailsResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateListRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateListRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\GetAccountPolicyTemplateListResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>GetAccountPolicyTemplateListResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\InitiateInviteRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>InitiateInviteRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\InitiateInviteResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>InitiateInviteResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RenewSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RenewSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RenewSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RenewSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestCertificateStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestCertificateStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestCertificateStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestCertificateStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequestResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestDomainRequestStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestDomainRequestStatusResponse.cs">
+      <DependentUpon>RequestDomainRequestStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequestResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequestResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationRequestStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationRequestStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestOrganisationStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestOrganisationStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertStatusRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertStatusRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RequestSSLCertStatusResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RequestSSLCertStatusResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveCertificateRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveCertificateRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveCertificateResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveCertificateResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RetrieveSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RetrieveSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateBySerialNoRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateBySerialNoRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateBySerialNoResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateBySerialNoResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeCertificateResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeCertificateResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeSSLCertRequest.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeSSLCertRequest.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Client\XSDs\RevokeSSLCertResponse.cs">
+      <SubType>code</SubType>
+      <DependentUpon>RevokeSSLCertResponse.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Attribute.cs" />
+    <Compile Include="Models\Certificate.cs" />
+    <Compile Include="Models\GatewayItem.cs" />
+    <Compile Include="Interfaces\IGatewayItem.cs" />
+    <Compile Include="Models\KeyfactorCertificate.cs" />
+    <Compile Include="QuovadisCaProxy.cs" />
+    <Compile Include="Exceptions\RetryCountExceededException.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Client\QuovadisClient.config" />
+    <None Include="Client\XSDs\AddSubscriberRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\AddSubscriberResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountDomainListRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountDomainListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountOrganisationListRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountOrganisationListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateDetailsRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateDetailsResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateListRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\GetAccountPolicyTemplateListResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\InitiateInviteRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\InitiateInviteResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RenewSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RenewSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestCertificateStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestCertificateStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestDomainRequestStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequestResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationRequestStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestOrganisationStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertStatusRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RequestSSLCertStatusResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveCertificateRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveCertificateResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RetrieveSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateBySerialNoRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateBySerialNoResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeCertificateResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeSSLCertRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Client\XSDs\RevokeSSLCertResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

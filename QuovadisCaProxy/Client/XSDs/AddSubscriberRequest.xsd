@@ -1,0 +1,20 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="AddSubscriberRequest" type="AddSubscriberRequestType" />
+	<xsd:complexType name="AddSubscriberRequestType">
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Account" type="SubscriberAccountInfo" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SubscriberEmailAddress" type="xsd:string" />
+			<xsd:element name="NameFirst" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="NameLast" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Telephone" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Test" type="xsd:boolean" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SubscriberAccountInfo">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

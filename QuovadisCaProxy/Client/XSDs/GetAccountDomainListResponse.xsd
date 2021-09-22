@@ -1,0 +1,38 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
+	<xsd:element name="GetAccountDomainListResponse" type="GetAccountDomainListResponseType"/>
+	<xsd:complexType name="GetAccountDomainListResponseType">
+		<xsd:sequence>
+			<xsd:element name="Result" type="ResultType"/>
+			<xsd:element name="DateTime" type="xsd:dateTime"/>
+			<xsd:element name="ErrorCode" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Details" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Domains" type="DomainListArray" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="ResultType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Success"/>
+			<xsd:enumeration value="Failure"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="DomainListArray">
+		<xsd:sequence>
+			<xsd:element name="Domain" type="DomainList" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DomainList">
+		<xsd:sequence>
+			<xsd:element name="Guid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Domain" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Organisation" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Account" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="CreationDate" type="xsd:datetime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="LastModifiedDate" type="xsd:datetime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="VettingExpiryDate" type="xsd:datetime" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="IsEV" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Enabled" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="Retired" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
