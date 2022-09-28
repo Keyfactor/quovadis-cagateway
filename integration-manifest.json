@@ -4,5 +4,7 @@
     "name": "Quovadis",
     "status": "production",
     "description": "Quovadis operates a PKI as a service platform for customers around the globe.  The AnyGateway solution for Quovadis is designed to allow Keyfactor Command the ability to: - Sync certificates issued from the CA - Request new certificates from the CA - Revoke certificates directly from Keyfactor Command",
-    "link_github": true
+    "update_catalog": true,
+    "link_github": true,
+    "support_level": "community"
 }
